@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: jobfinder
+          uri: http://jobfinder-service:8081
+          predicates:
+            - Path=/jobs/**
+          filters:
+            - StripPrefix=1
+        - id: eventhandler
+          uri: http://eventhandler-service:8082
+          predicates:
+            - Path=/events/**
+          filters:
+            - StripPrefix=1
