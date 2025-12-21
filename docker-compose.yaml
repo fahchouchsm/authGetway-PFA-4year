@@ -18,11 +18,13 @@ services:
     depends_on:
       - mysql
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/authgetway
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: admin
+    tty: true
+    stdin_open: true
 
 volumes:
   mysql_data:
