@@ -15,7 +15,7 @@ public class RootController {
 
     @GetMapping("/")
     public String Index() {
-        User user = new User("simo");
+        User user = new User();
         UserRepository.save(user);
         return "simo created";
     };
