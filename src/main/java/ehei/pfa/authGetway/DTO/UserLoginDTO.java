@@ -1,13 +1,13 @@
 package ehei.pfa.authGetway.DTO;
 
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @NoArgsConstructor
-public class UserRegisterDTO {
-    private String password;
-    private String name;
-    private String lastName;
+@Getter
+public class UserLoginDTO {
     private String email;
+    private String password;
+    private boolean stayLogin;
 }
