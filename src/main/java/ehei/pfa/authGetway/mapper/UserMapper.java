@@ -11,6 +11,7 @@ public class UserMapper {
         User user = new User();
         user.setLastName(dto.getLastName());
         user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
         // no password because the service will hash it
         return user;
     }

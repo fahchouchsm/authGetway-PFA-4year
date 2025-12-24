@@ -12,17 +12,36 @@ import java.io.IOException;
 
 @Component
 public class ReqLogFilter extends OncePerRequestFilter {
+
+    private static final String RESET = "\u001B[0m";
+    private static final String RED = "\u001B[31m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String YELLOW = "\u001B[33m";
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
+            FilterChain filterChain
     ) throws ServletException, IOException {
+
         long start = System.currentTimeMillis();
         filterChain.doFilter(request, response);
         long time = System.currentTimeMillis() - start;
+
+        int status = response.getStatus();
+        String color;
+
+        if (status >= 200 && status < 300) {
+            color = GREEN;
+        } else if (status >= 300 && status < 400) {
+            color = YELLOW;
+        } else {
+            color = RED;
+        }
+
         System.out.println(request.getMethod() + " " +
                 request.getRequestURI() + " -> " +
-                response.getStatus() + " (" + time + "ms)");
+                color + status + RESET + " (" + time + "ms)");
     }
 }
