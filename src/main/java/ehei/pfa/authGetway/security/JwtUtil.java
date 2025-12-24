@@ -1,4 +1,4 @@
-package ehei.pfa.authGetway.config;
+package ehei.pfa.authGetway.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
