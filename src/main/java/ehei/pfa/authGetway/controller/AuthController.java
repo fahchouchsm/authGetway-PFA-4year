@@ -22,15 +22,16 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
-        authService.register(userRegisterDTO);
-        ApiResponse<Void> res = ApiResponse.success("user created");
+    public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody UserRegisterDTO dto) {
+        authService.register(dto);
+        ApiResponse<Void> res = ApiResponse.success("User created.");
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     @PostMapping
-    public String login(@RequestBody UserLoginDTO userLoginDTO) {
-        // todo
-        return "";
+    public ResponseEntity<ApiResponse<String>> login(@RequestBody UserLoginDTO dto) {
+        String token = authService.login(dto);
+        ApiResponse<String> res = ApiResponse.success("Login successful.", token);
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 }
