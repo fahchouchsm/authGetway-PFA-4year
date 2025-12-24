@@ -1,0 +1,51 @@
+@startuml
+skinparam linetype ortho
+
+class Category {
+    title: String
+}
+
+class Offer {
+    title: String
+    description: String
+}
+
+class Application {
+    id: Long
+    cvPath: String
+    description: String
+}
+
+class Enterprise {
+    companyName: String
+    website: String
+}
+
+class User {
+    id: Long
+    username: String
+    email: String
+    password: String
+}
+
+class Admin {
+}
+
+class Client {
+}
+
+Category "1" <-- "0..*" Category : sub-categories
+
+Offer "0..*" --> "1" Category : categorized by
+
+Offer "0..*" -- "1" Enterprise : created by
+
+Offer "1" --> "0..*" Application : receives
+
+Application "0..*" --> "1" User : submitted by
+
+User <|-- Enterprise
+User <|-- Admin
+User <|-- Client
+
+@enduml
