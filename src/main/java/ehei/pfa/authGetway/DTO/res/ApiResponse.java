@@ -1,4 +1,4 @@
-package ehei.pfa.authGetway.Utils;
+package ehei.pfa.authGetway.DTO.res;
 
 import lombok.Getter;
 import lombok.Setter;

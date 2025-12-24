@@ -2,7 +2,8 @@ package ehei.pfa.authGetway.controller;
 
 import ehei.pfa.authGetway.DTO.UserLoginDTO;
 import ehei.pfa.authGetway.DTO.UserRegisterDTO;
-import ehei.pfa.authGetway.Utils.ApiResponse;
+import ehei.pfa.authGetway.DTO.res.ApiResponse;
+import ehei.pfa.authGetway.DTO.res.LoginResDTO;
 import ehei.pfa.authGetway.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -29,9 +30,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<String>> login(@RequestBody UserLoginDTO dto) {
+    public ResponseEntity<ApiResponse<LoginResDTO>> login(@RequestBody UserLoginDTO dto) {
         String token = authService.login(dto);
-        ApiResponse<String> res = ApiResponse.success("Login successful.", token);
+        LoginResDTO loginResDTO = new LoginResDTO(token);
+        ApiResponse<LoginResDTO> res = ApiResponse.success("Login successful.", loginResDTO);
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 }
