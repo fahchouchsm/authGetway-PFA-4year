@@ -3,16 +3,16 @@ package ehei.pfa.authGetway.security;
 import ehei.pfa.authGetway.constant.TIME;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
+import java.security.*;
 import java.util.Date;
 
 public class JwtUtil {
     private static final KeyPair keyPair = generateKeyPair();
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final PrivateKey privateKey = keyPair.getPrivate();
+    @Getter
+    private static final PublicKey publicKey = keyPair.getPublic();
 
     private static KeyPair generateKeyPair() {
         try {
@@ -24,12 +24,28 @@ public class JwtUtil {
         }
     }
 
+    public static String genToken(String userId, long expMillis) {
+        Date now = new Date();
+
+        return Jwts.builder()
+                .setSubject(userId)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + expMillis))
+                .signWith(privateKey, SignatureAlgorithm.RS256)
+                .compact();
+    }
 
     public static String genToken(String userId) {
-        return Jwts.builder().setSubject(userId).setExpiration(new Date(System.currentTimeMillis() + TIME.ONEDAY)).signWith(key).compact();
+        return genToken(userId, TIME.ONEDAY);
     }
 
-    public static String genToken(String userId, long exp) {
-        return Jwts.builder().setSubject(userId).setExpiration(new Date(System.currentTimeMillis() + exp)).signWith(key).compact();
+    public static String validateToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(publicKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
+
 }

@@ -53,4 +53,6 @@ public class AuthService {
         }
         return JwtUtil.genToken(String.valueOf(user.getId()));
     }
+
+
 }
