@@ -29,8 +29,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResDTO>> login(@RequestBody UserLoginDTO dto) {
         String token = authService.login(dto);
-        LoginResDTO loginResDTO = new LoginResDTO(token);
-        ApiResponse<LoginResDTO> res = ApiResponse.success("Login successful.", loginResDTO);
+        ApiResponse<LoginResDTO> res = ApiResponse.success("Login successful.", new LoginResDTO(token));
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 }
