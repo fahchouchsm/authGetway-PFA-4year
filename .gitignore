@@ -33,7 +33,3 @@ build/
 .vscode/
 
 .env
-
-
-### temp ###
-application.yaml
