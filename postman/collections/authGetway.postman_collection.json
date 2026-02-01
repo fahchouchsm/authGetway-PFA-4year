@@ -1,0 +1,285 @@
+{
+  "info": {
+    "_postman_id": "8ac8e04f-766d-4c58-81f8-c63cb149062f",
+    "name": "authGetway",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "hello",
+      "id": "ba803ce8-3575-4bdd-8e4c-c93c7c5ea607",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/hello",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "hello"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/",
+      "id": "09a3ad55-ce35-4753-a59b-cbcfcb572669",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "loginForm",
+      "id": "621c7c2c-d7fc-4390-99a9-eadeb5cd1847",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:8080/login",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "72abd3a8-ff54-494c-af64-b8080102a541",
+            "exec": [
+              "// // Debug object collector for failures",
+              "// let debugInfo = {",
+              "//     status: pm.response.code,",
+              "//     responseTime: pm.response.responseTime,",
+              "//     bodySnippet: pm.response.text().substring(0, 300),",
+              "//     headers: {}",
+              "// };",
+              "",
+              "// pm.response.headers.each((header) => {",
+              "//     debugInfo.headers[header.key] = header.value;",
+              "// });",
+              "",
+              "// let testsPassed = true;",
+              "",
+              "// // 1) Assert response status is 200 or 201; handle 400 specially",
+              "// pm.test(\"Response status is 200 or 201 (success)\", function () {",
+              "//     if (pm.response.code === 400) {",
+              "//         // For 400 status, assert error details and log timestamp",
+              "//         let jsonData;",
+              "//         try {",
+              "//             jsonData = pm.response.json();",
+              "//         } catch (e) {",
+              "//             pm.expect.fail(\"400 response body is not valid JSON\");",
+              "//         }",
+              "//         pm.expect(jsonData).to.have.property('error');",
+              "//         pm.expect(jsonData.error).to.include('Bad Request');",
+              "//         console.log(\"400 Bad Request received at timestamp:\", jsonData.timestamp || new Date().toISOString());",
+              "//         testsPassed = false;",
+              "//         pm.expect.fail(\"Expected 200 or 201 but received 400 Bad Request\");",
+              "//     } else {",
+              "//         pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "//     }",
+              "// });",
+              "",
+              "// // 2) Parse JSON body safely and validate fields on success",
+              "// let jsonBody = null;",
+              "// pm.test(\"Response body is valid JSON\", function () {",
+              "//     try {",
+              "//         jsonBody = pm.response.json();",
+              "//         pm.expect(jsonBody).to.be.an('object');",
+              "//     } catch (e) {",
+              "//         testsPassed = false;",
+              "//         pm.expect.fail(\"Response body is not valid JSON: \" + e.message);",
+              "//     }",
+              "// });",
+              "",
+              "// if (pm.response.code === 200 || pm.response.code === 201) {",
+              "//     pm.test(\"Field 'id' is present and is a number or string\", function () {",
+              "//         if (jsonBody) {",
+              "//             pm.expect(jsonBody).to.have.property('id');",
+              "//             pm.expect(typeof jsonBody.id === 'number' || typeof jsonBody.id === 'string').to.be.true;",
+              "//         } else {",
+              "//             testsPassed = false;",
+              "//             pm.expect.fail(\"Cannot validate 'id' - JSON body not available\");",
+              "//         }",
+              "//     });",
+              "",
+              "//     pm.test(\"Name field is present ('name' or 'firstName'/'lastName') and is string\", function () {",
+              "//         if (jsonBody) {",
+              "//             const hasName = jsonBody.hasOwnProperty('name');",
+              "//             const hasFirstLastName = jsonBody.hasOwnProperty('firstName') || jsonBody.hasOwnProperty('lastName');",
+              "//             pm.expect(hasName || hasFirstLastName, \"Expected 'name' or 'firstName'/'lastName' to be present\").to.be.true;",
+              "            ",
+              "//             if (hasName) {",
+              "//                 pm.expect(jsonBody.name).to.be.a('string');",
+              "//             }",
+              "//             if (jsonBody.firstName) {",
+              "//                 pm.expect(jsonBody.firstName).to.be.a('string');",
+              "//             }",
+              "//             if (jsonBody.lastName) {",
+              "//                 pm.expect(jsonBody.lastName).to.be.a('string');",
+              "//             }",
+              "//         } else {",
+              "//             testsPassed = false;",
+              "//             pm.expect.fail(\"Cannot validate name fields - JSON body not available\");",
+              "//         }",
+              "//     });",
+              "",
+              "//     pm.test(\"Field 'email' is present, is a string, and matches email pattern\", function () {",
+              "//         if (jsonBody) {",
+              "//             pm.expect(jsonBody).to.have.property('email');",
+              "//             pm.expect(jsonBody.email).to.be.a('string');",
+              "//             const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;",
+              "//             pm.expect(jsonBody.email).to.match(emailPattern);",
+              "//         } else {",
+              "//             testsPassed = false;",
+              "//             pm.expect.fail(\"Cannot validate 'email' - JSON body not available\");",
+              "//         }",
+              "//     });",
+              "// }",
+              "",
+              "// // 3) Check response time is under 2000ms",
+              "// pm.test(\"Response time is under 2000ms\", function () {",
+              "//     if (pm.response.responseTime >= 2000) {",
+              "//         testsPassed = false;",
+              "//     }",
+              "//     pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "// });",
+              "",
+              "// // 4) If response contains validation errors array, validate structure",
+              "// pm.test(\"Validation errors array (if present) has correct structure\", function () {",
+              "//     if (jsonBody) {",
+              "//         const errorsArray = jsonBody.errors || jsonBody.violations;",
+              "//         if (errorsArray !== undefined) {",
+              "//             pm.expect(errorsArray).to.be.an('array');",
+              "//             errorsArray.forEach((item, index) => {",
+              "//                 pm.expect(item, `Error item at index ${index} should have 'field' as string`).to.have.property('field').that.is.a('string');",
+              "//                 pm.expect(item, `Error item at index ${index} should have 'message' as string`).to.have.property('message').that.is.a('string');",
+              "//             });",
+              "//         } else {",
+              "//             // No errors array present - this is acceptable",
+              "//             pm.expect(true).to.be.true;",
+              "//         }",
+              "//     }",
+              "// });",
+              "",
+              "// // 5) Save any returned token to environment variable 'authToken'",
+              "// if (jsonBody) {",
+              "//     const token = jsonBody.token || jsonBody.accessToken;",
+              "//     if (token) {",
+              "//         pm.environment.set(\"authToken\", token);",
+              "//         console.log(\"Auth token saved to environment variable 'authToken'\");",
+              "//     }",
+              "// }",
+              "",
+              "// // 6) On failure, collect debug object and save to collection variable",
+              "// if (!testsPassed || pm.response.code >= 400) {",
+              "//     pm.collectionVariables.set(\"lastFailedResponse\", JSON.stringify(debugInfo));",
+              "//     console.log(\"Debug info saved to collection variable 'lastFailedResponse':\", debugInfo);",
+              "// }"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "df70a5db-6b1a-4338-975d-4f1b8615d633",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "a09b3033-7a21-479b-ae18-9c8995fbb065",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "name",
+            "value": "mohammed",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "lastName",
+            "value": "Fahchouch",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "email",
+            "value": "fahchouchsm@gmail.com",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "password",
+            "value": "hamidlamba123",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"Simo\",\r\n  \"lastName\": \"Elcool\",\r\n  \"email\": \"simo@example.com\",\r\n  \"password\": \"StrongPass123!\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "id": "fa8b237c-6de1-4a61-b2d9-f1e47dc9b521",
+      "key": "lastFailedResponse",
+      "value": ""
+    }
+  ]
+}

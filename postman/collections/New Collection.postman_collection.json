@@ -1,0 +1,111 @@
+{
+  "info": {
+    "_postman_id": "16f03153-a1fe-4721-8251-eb3a264d0ef0",
+    "name": "Mouhib",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "register",
+      "id": "c020f529-75a2-441f-9e37-64d6c0831eb6",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "    {\r\n    \"name\": \"Mouhib\",\r\n    \"lastName\": \"Med\",\r\n    \"email\": \"giftsbusinessofficial@gmail.com\",\r\n    \"password\": \"strong123\"\r\n    }\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "add trade",
+      "id": "7ef9299c-2512-4e99-b8bf-a3c2830aee1c",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer  eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzY3MDI2NzMxLCJleHAiOjE3NjcxMTMxMzF9.rLDQpNZ9Zq4YZdD-fIYngLnyn7UWCdCDtoeY-AFaAZw",
+            "type": "text",
+            "uuid": "69760006-8390-4607-8b98-a000e74935b4"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "uuid": "2014f3a6-2d82-4f25-84a9-0abd522c6926"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"day\": 29,\r\n    \"month\": 12,\r\n    \"year\": 2025,\r\n    \"risk\": 5,\r\n    \"rr\": 2,\r\n    \"pair\": \"EURUSD\",\r\n    \"action\": \"BUY\",\r\n    \"winLoss\": true\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/trades/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "trades",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login",
+      "id": "b17f4192-c17e-41e8-be3f-19298db48094",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"giftsbusinessofficial@gmail.com\",\r\n    \"password\": \"strong123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "login"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

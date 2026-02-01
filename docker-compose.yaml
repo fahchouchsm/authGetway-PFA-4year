@@ -1,18 +1,1 @@
-services:
-  maven-db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: authgetway
-    ports:
-      - "3307:3306"
-
-  maven-app:
-    build: .
-    depends_on:
-      - maven-db
-    environment:
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "8080:8080"
+services:  maven-db:    volumes:      - mysql_data:/var/lib/mysql    image: mysql:8.0    environment:      MYSQL_ROOT_PASSWORD: admin      MYSQL_DATABASE: authgetway    ports:      - "3307:3306"  maven-app:    build: .    depends_on:      - maven-db    environment:      DB_USER: ${DB_USER}      DB_PASSWORD: ${DB_PASSWORD}    ports:      - "8080:8080"
