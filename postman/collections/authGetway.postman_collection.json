@@ -52,12 +52,13 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "localhost:8080/login",
+          "raw": "localhost:8080/auth/login",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
+            "auth",
             "login"
           ]
         }
@@ -252,7 +253,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"name\": \"Simo\",\r\n  \"lastName\": \"Elcool\",\r\n  \"email\": \"simo@example.com\",\r\n  \"password\": \"StrongPass123!\"\r\n}",
+          "raw": "{\r\n  \"name\": \"simo\",\r\n  \"lastName\": \"fahchouch\",\r\n  \"email\": \"simo@gmail.com\",\r\n  \"password\": \"simo10325033\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
