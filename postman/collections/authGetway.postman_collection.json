@@ -6,20 +6,21 @@
   },
   "item": [
     {
-      "name": "hello",
+      "name": "public key",
       "id": "ba803ce8-3575-4bdd-8e4c-c93c7c5ea607",
       "request": {
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/hello",
+          "raw": "http://localhost:8080/jwt/public_key",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
-            "hello"
+            "jwt",
+            "public_key"
           ]
         }
       },
