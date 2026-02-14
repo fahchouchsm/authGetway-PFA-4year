@@ -1,47 +1,46 @@
 package ehei.pfa.authGetway.security;
 
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class VerificationToken {
-    private static final Duration timeLimit = Duration.ofMinutes(10);
 
-    private static class Entry {
-        final long userId;
-        final Instant expiredAt;
+    private static final Duration TTL = Duration.ofMinutes(10);
+    private static final String PREFIX = "verify:";
 
-        public Entry(long userId, Instant expiredAt) {
-            this.userId = userId;
-            this.expiredAt = expiredAt;
-        }
+    private final StringRedisTemplate redis;
+
+    public VerificationToken(StringRedisTemplate redis) {
+        this.redis = redis;
     }
-
-    private final Map<String, Entry> tokens = new ConcurrentHashMap<>();
 
     public String createToken(long userId) {
         String token = UUID.randomUUID().toString();
-        tokens.put(token, new Entry(userId, Instant.now().plus(timeLimit)));
+        String key = PREFIX + token;
+
+        redis.opsForValue().set(key, String.valueOf(userId), TTL);
         return token;
     }
 
     public Long consumeToken(String token) {
+        String key = PREFIX + token;
 
-        Entry entry = tokens.remove(token);
+        String userIdStr = redis.opsForValue().get(key);
+        if (userIdStr == null) {
+            throw new InvalidVerificationTokenException("Token invalide ou expiré.");
+        }
 
-        if (entry == null) {
+        redis.delete(key);
+
+        try {
+            return Long.parseLong(userIdStr);
+        } catch (NumberFormatException e) {
+            redis.delete(key);
             throw new InvalidVerificationTokenException("Token invalide.");
         }
-
-        if (Instant.now().isAfter(entry.expiredAt)) {
-            throw new InvalidVerificationTokenException("Token expiré.");
-        }
-
-        return entry.userId;
     }
 }
