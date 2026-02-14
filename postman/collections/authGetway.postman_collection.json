@@ -30,28 +30,48 @@
       "name": "/",
       "id": "09a3ad55-ce35-4753-a59b-cbcfcb572669",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI4IiwiaWQiOiI4Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NzExMTI5NTgsImV4cCI6MTc3MTE5OTM1OH0.LeOlTD0Ej6BelELukab3HVBnG9-Dws770i4Gki7RAPkwZpsw9A_ngXe3ENT6v82vMS08COabI76X8Mtp7qMKVhDkqxa4BwDFcpRPuJWGNQutP33-tqwRMk1XBn93q2YO8Dxp5Z1pVBGlGQC_ve-wPTLz0o6cbCGu5M0DR0juydpLD-p8NnCEf9SMmv-wNWaE8fHiUZTIJdgEty33dkMz4s9z20Qh-hx2OmG3FROSwSo4Ev1nu_rr63mPewhokX4yn_lpVtni2j6AJZZ1vU2SqUI0q2PsLXMo-GX9ZFxJDCRCU4Z6SZW_laRhQZVg8aZPXrhalA41M5G3tOBpiD1PrA",
+              "type": "string"
+            }
+          ]
+        },
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/",
+          "raw": "http://localhost:8080/user/hello",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
-            ""
+            "user",
+            "hello"
           ]
         }
       },
       "response": []
     },
     {
-      "name": "loginForm",
+      "name": "login",
       "id": "621c7c2c-d7fc-4390-99a9-eadeb5cd1847",
       "request": {
-        "method": "GET",
+        "method": "POST",
         "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"simofff0@gmail.com\",\r\n  \"password\": \"simo10325033\",\r\n  \"stayLogin\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
         "url": {
           "raw": "localhost:8080/auth/login",
           "host": [

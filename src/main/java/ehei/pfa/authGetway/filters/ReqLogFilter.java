@@ -10,7 +10,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
 public class ReqLogFilter extends OncePerRequestFilter {
 
     private static final String RESET = "\u001B[0m";
