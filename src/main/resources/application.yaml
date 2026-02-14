@@ -29,3 +29,19 @@ spring:
             - Path=/events/**
           filters:
             - StripPrefix=1
+
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: a2668c001@smtp-brevo.com
+    password: sFSYxwj8AEZWO610
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  mail:
+    from: simofff0@gmail.com
