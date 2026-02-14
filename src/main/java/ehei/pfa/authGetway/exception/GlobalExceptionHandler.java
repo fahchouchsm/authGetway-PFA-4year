@@ -49,9 +49,13 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
     }
 
-    // optional: catch-all so you don't leak ugly stack traces
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleAny(Exception ex) {
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", null);
+    }
+
+    @ExceptionHandler(EmailSendException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailError(EmailSendException ex) {
+        return build(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), null);
     }
 }
