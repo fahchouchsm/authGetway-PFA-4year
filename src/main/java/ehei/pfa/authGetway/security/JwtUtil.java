@@ -1,6 +1,7 @@
 package ehei.pfa.authGetway.security;
 
 import ehei.pfa.authGetway.constant.TIME;
+import ehei.pfa.authGetway.enums.UserRole;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Getter;
@@ -24,19 +25,21 @@ public class JwtUtil {
         }
     }
 
-    public static String genToken(String userId, long expMillis) {
+    public static String genToken(String userId, UserRole role, long expMillis) {
         Date now = new Date();
 
         return Jwts.builder()
                 .setSubject(userId)
+                .claim("id",userId)
+                .claim("role", role.name())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + expMillis))
                 .signWith(privateKey, SignatureAlgorithm.RS256)
                 .compact();
     }
 
-    public static String genToken(String userId) {
-        return genToken(userId, TIME.ONEDAY);
+    public static String genToken(String userId, UserRole role) {
+        return genToken(userId, role, TIME.ONEDAY);
     }
 
     public static String validateToken(String token) {
@@ -47,5 +50,4 @@ public class JwtUtil {
                 .getBody()
                 .getSubject();
     }
-
 }

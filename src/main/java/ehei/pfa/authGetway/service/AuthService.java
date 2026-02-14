@@ -49,10 +49,8 @@ public class AuthService {
         }
 
         if(dto.isStayLogin()){
-            return JwtUtil.genToken(String.valueOf(user.getId()), TIME.ONEMONTH);
+            return JwtUtil.genToken(String.valueOf(user.getId()), user.getRole(), TIME.ONEMONTH);
         }
-        return JwtUtil.genToken(String.valueOf(user.getId()));
+        return JwtUtil.genToken(String.valueOf(user.getId()), user.getRole());
     }
-
-
 }
