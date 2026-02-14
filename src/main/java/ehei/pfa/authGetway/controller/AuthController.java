@@ -6,7 +6,6 @@ import ehei.pfa.authGetway.DTO.res.ApiResponse;
 import ehei.pfa.authGetway.DTO.res.LoginResDTO;
 import ehei.pfa.authGetway.service.AuthService;
 import ehei.pfa.authGetway.service.MailService;
-import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

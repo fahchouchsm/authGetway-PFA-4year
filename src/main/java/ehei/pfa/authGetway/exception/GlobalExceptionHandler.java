@@ -1,5 +1,6 @@
 package ehei.pfa.authGetway.exception;
 
+import ehei.pfa.authGetway.security.InvalidVerificationTokenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -57,5 +58,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailSendException.class)
     public ResponseEntity<Map<String, Object>> handleEmailError(EmailSendException ex) {
         return build(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), null);
+    }
+
+    @ExceptionHandler(InvalidVerificationTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidToken(InvalidVerificationTokenException ex) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
     }
 }

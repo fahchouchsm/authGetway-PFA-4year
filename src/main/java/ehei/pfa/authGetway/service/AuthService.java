@@ -25,20 +25,18 @@ public class AuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
     private final UserMapper userMapper;
-    private final VerificationToken verificationToken;
-    private final MailService mailService;
+    private final UserService userService;
 
-    public AuthService(UserRepository userRepository, BCryptPasswordEncoder encoder, UserMapper userMapper, VerificationToken verificationToken, MailService mailService) {
+
+    public AuthService(UserRepository userRepository, BCryptPasswordEncoder encoder, UserMapper userMapper, UserService userService) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.userMapper = userMapper;
-        this.verificationToken = verificationToken;
-        this.mailService = mailService;
+        this.userService = userService;
     }
 
     @Transactional
     public void register(RegisterDTO dto) {
-
         if (userRepository.existsUserByEmail(dto.getEmail())) {
             throw new UserAlreadyExistsException("Email already in use");
         }
@@ -60,9 +58,7 @@ public class AuthService {
         }
 
         userRepository.save(user);
-        String token = verificationToken.createToken(user.getId());
-        String link = ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/verify/email").queryParam("token", token).toUriString();
-        mailService.sendVerificationEmail(user.getEmail(), new RegisterEmailDTO(link, user.getName(), user.getLastName()));
+        userService.sendVerificationEmail(user);
     }
 
     @Transactional

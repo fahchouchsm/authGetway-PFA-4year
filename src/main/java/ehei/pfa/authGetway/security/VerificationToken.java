@@ -31,9 +31,17 @@ public class VerificationToken {
     }
 
     public Long consumeToken(String token) {
+
         Entry entry = tokens.remove(token);
-        if(entry == null) return null;
-        if (Instant.now().isAfter(entry.expiredAt)) return null;
+
+        if (entry == null) {
+            throw new InvalidVerificationTokenException("Token invalide.");
+        }
+
+        if (Instant.now().isAfter(entry.expiredAt)) {
+            throw new InvalidVerificationTokenException("Token expiré.");
+        }
+
         return entry.userId;
     }
 }

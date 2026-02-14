@@ -1,14 +1,27 @@
 package ehei.pfa.authGetway.controller;
 
-import ehei.pfa.authGetway.DTO.res.ApiResponse;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import ehei.pfa.authGetway.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
-@RestController("/user")
+@RestController
+@RequestMapping("/user")
 public class UserController {
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
+    private UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/verify/email")
-    public ResponseEntity<ApiResponse<Void>>
+    public RedirectView verifyEmail(@RequestParam String token) {
+        userService.verifyEmailLink(token);
+        return new RedirectView(frontendUrl + "/verified");
+    }
 }
