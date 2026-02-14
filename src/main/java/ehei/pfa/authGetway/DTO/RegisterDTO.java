@@ -1,9 +1,8 @@
-package ehei.pfa.authGetway.DTO.register;
+package ehei.pfa.authGetway.DTO;
 
 import ehei.pfa.authGetway.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +25,6 @@ public class RegisterDTO {
     @Size(min = 6, max = 100)
     private String password;
 
-    @NotNull
     private UserRole role;
 
     private String website;

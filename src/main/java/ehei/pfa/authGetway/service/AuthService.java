@@ -1,10 +1,11 @@
 package ehei.pfa.authGetway.service;
 
+import ehei.pfa.authGetway.DTO.RegisterDTO;
 import ehei.pfa.authGetway.DTO.UserLoginDTO;
-import ehei.pfa.authGetway.DTO.UserRegisterDTO;
-import ehei.pfa.authGetway.constant.TIME;
+ import ehei.pfa.authGetway.constant.TIME;
 import ehei.pfa.authGetway.database.entity.User;
 import ehei.pfa.authGetway.database.repository.UserRepository;
+import ehei.pfa.authGetway.enums.UserRole;
 import ehei.pfa.authGetway.exception.InvalidCredentialsException;
 import ehei.pfa.authGetway.exception.UserAlreadyExistsException;
 import ehei.pfa.authGetway.exception.UserNotFoundException;
@@ -27,13 +28,31 @@ public class AuthService {
     }
 
     @Transactional
-    public void register(UserRegisterDTO dto) {
-        if(userRepository.existsUserByEmail((dto.getEmail()))){
+    public void register(RegisterDTO dto) {
+
+        if (userRepository.existsUserByEmail(dto.getEmail())) {
             throw new UserAlreadyExistsException("Email already in use");
         }
 
+        UserRole role = (dto.getRole() == null) ? UserRole.USER : dto.getRole();
+
+        if (role == UserRole.COMPANY) {
+            if (dto.getWebsite() == null || dto.getWebsite().trim().isEmpty()) {
+                throw new InvalidCredentialsException("Website required for company."); // or your own exception
+            }
+            if (!dto.getWebsite().startsWith("http://") && !dto.getWebsite().startsWith("https://")) {
+                throw new InvalidCredentialsException("Website must start with http:// or https://");
+            }
+        }
+
         User user = userMapper.toEntity(dto);
+        user.setRole(role);
         user.setPassword(encoder.encode(dto.getPassword()));
+
+        if (role != UserRole.COMPANY) {
+            user.setWebsite(null); // keep DB clean
+        }
+
         userRepository.save(user);
     }
 

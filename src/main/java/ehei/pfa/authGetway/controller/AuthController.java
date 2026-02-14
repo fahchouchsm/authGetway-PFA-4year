@@ -1,7 +1,7 @@
 package ehei.pfa.authGetway.controller;
 
+import ehei.pfa.authGetway.DTO.RegisterDTO;
 import ehei.pfa.authGetway.DTO.UserLoginDTO;
-import ehei.pfa.authGetway.DTO.UserRegisterDTO;
 import ehei.pfa.authGetway.DTO.res.ApiResponse;
 import ehei.pfa.authGetway.DTO.res.LoginResDTO;
 import ehei.pfa.authGetway.service.AuthService;
@@ -20,7 +20,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody UserRegisterDTO dto) {
+    public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody RegisterDTO dto) {
         authService.register(dto);
         ApiResponse<Void> res = ApiResponse.success("User created.");
         return ResponseEntity.status(HttpStatus.CREATED).body(res);

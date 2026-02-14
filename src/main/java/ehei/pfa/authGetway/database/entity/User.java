@@ -29,6 +29,9 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
+    @Column(length = 255)
+    private String website;
+
     @PrePersist
     void setDefault() {
         if (role == null) {
