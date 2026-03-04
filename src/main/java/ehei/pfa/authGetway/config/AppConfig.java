@@ -39,6 +39,7 @@ public class AppConfig {
                         .requestMatchers(
                                 "/auth/register",
                                 "/auth/login",
+                                "/auth/refresh",
                                 "/user/verify/email",
                                 "/jwt/public_key"
                         ).permitAll()
