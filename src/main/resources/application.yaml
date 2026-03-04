@@ -50,3 +50,4 @@ app:
   frontend-url: localhost:3000
   mail:
     from: simofff0@gmail.com
+  use-https: false

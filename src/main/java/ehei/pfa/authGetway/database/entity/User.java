@@ -1,6 +1,7 @@
 package ehei.pfa.authGetway.database.entity;
 
 import ehei.pfa.authGetway.enums.UserRole;
+import ehei.pfa.authGetway.security.TimeHashedIdGenerator;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,8 @@ import lombok.Setter;
 @Entity
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @Column(nullable = false, updatable = false, length = 64)
+    private String id;
 
     private String name;
 
@@ -37,6 +38,9 @@ public class User {
 
     @PrePersist
     void setDefault() {
+        if (id == null || id.isBlank()) {
+            id = TimeHashedIdGenerator.generate();
+        }
         if (role == null) {
             role = UserRole.USER;
         }

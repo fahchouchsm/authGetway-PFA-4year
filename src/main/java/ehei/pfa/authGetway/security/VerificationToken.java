@@ -18,29 +18,23 @@ public class VerificationToken {
         this.redis = redis;
     }
 
-    public String createToken(long userId) {
+    public String createToken(String userId) {
         String token = UUID.randomUUID().toString();
         String key = PREFIX + token;
 
-        redis.opsForValue().set(key, String.valueOf(userId), TTL);
+        redis.opsForValue().set(key, userId, TTL);
         return token;
     }
 
-    public Long consumeToken(String token) {
+    public String consumeToken(String token) {
         String key = PREFIX + token;
 
-        String userIdStr = redis.opsForValue().get(key);
-        if (userIdStr == null) {
+        String userId = redis.opsForValue().get(key);
+        if (userId == null || userId.isBlank()) {
             throw new InvalidVerificationTokenException("Token invalide ou expiré.");
         }
 
         redis.delete(key);
-
-        try {
-            return Long.parseLong(userIdStr);
-        } catch (NumberFormatException e) {
-            redis.delete(key);
-            throw new InvalidVerificationTokenException("Token invalide.");
-        }
+        return userId;
     }
 }

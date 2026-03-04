@@ -5,8 +5,8 @@ import ehei.pfa.authGetway.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
-
 import java.security.*;
 import java.util.Date;
 
@@ -15,7 +15,35 @@ public class JwtUtil {
     private static final PrivateKey privateKey = keyPair.getPrivate();
     @Getter
     private static final PublicKey publicKey = keyPair.getPublic();
+    // refresh token
+    private static final Key refreshKey = generateHS256Key();
 
+    private static Key generateHS256Key() {
+        try {
+            return Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to generate HS256 key", ex);
+        }
+    }
+
+    public static String genRefreshToken(String userId, long exp) {
+        Date now = new Date();
+        return Jwts.builder()
+                .setSubject(userId)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + exp))
+                .signWith(refreshKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public static String validateRefreshToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(refreshKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
     private static KeyPair generateKeyPair() {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
@@ -40,7 +68,7 @@ public class JwtUtil {
     }
 
     public static String genToken(String userId, UserRole role) {
-        return genToken(userId, role, TIME.ONEDAY);
+        return genToken(userId, role, TIME.ONEHOUR);
     }
 
     public static String validateToken(String token) {

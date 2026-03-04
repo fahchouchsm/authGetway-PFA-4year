@@ -1,5 +1,6 @@
 package ehei.pfa.authGetway.exception;
 
+import ehei.pfa.authGetway.security.InvalidRefreshTokenException;
 import ehei.pfa.authGetway.security.InvalidVerificationTokenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,5 +70,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleBadJson(HttpMessageNotReadableException ex) {
         return build(HttpStatus.BAD_REQUEST, "Invalid JSON body", null);
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidRefreshToken(InvalidRefreshTokenException ex) {
+        return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
     }
 }

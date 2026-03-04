@@ -2,7 +2,9 @@ package ehei.pfa.authGetway.service;
 
 import ehei.pfa.authGetway.DTO.RegisterDTO;
 import ehei.pfa.authGetway.DTO.UserLoginDTO;
-import ehei.pfa.authGetway.DTO.email.RegisterEmailDTO;
+import ehei.pfa.authGetway.DTO.res.RegisterResDTO;
+import ehei.pfa.authGetway.config.AppProperties;
+import ehei.pfa.authGetway.constant.COOKIE;
 import ehei.pfa.authGetway.constant.TIME;
 import ehei.pfa.authGetway.database.entity.User;
 import ehei.pfa.authGetway.database.repository.UserRepository;
@@ -11,14 +13,17 @@ import ehei.pfa.authGetway.exception.InvalidCredentialsException;
 import ehei.pfa.authGetway.exception.UserAlreadyExistsException;
 import ehei.pfa.authGetway.exception.UserNotFoundException;
 import ehei.pfa.authGetway.mapper.UserMapper;
+import ehei.pfa.authGetway.security.InvalidRefreshTokenException;
 import ehei.pfa.authGetway.security.JwtUtil;
-import ehei.pfa.authGetway.security.VerificationToken;
-import jakarta.mail.MessagingException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
-import org.springframework.boot.servlet.autoconfigure.ServletEncodingProperties;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthService {
@@ -26,17 +31,21 @@ public class AuthService {
     private final BCryptPasswordEncoder encoder;
     private final UserMapper userMapper;
     private final UserService userService;
+    private final StringRedisTemplate redis;
+    private final AppProperties appProp;
 
 
-    public AuthService(UserRepository userRepository, BCryptPasswordEncoder encoder, UserMapper userMapper, UserService userService) {
+    public AuthService(UserRepository userRepository, BCryptPasswordEncoder encoder, UserMapper userMapper, UserService userService, StringRedisTemplate redis, AppProperties appProp) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.userMapper = userMapper;
         this.userService = userService;
+        this.redis = redis;
+        this.appProp = appProp;
     }
 
     @Transactional
-    public void register(RegisterDTO dto) {
+    public RegisterResDTO register(RegisterDTO dto) {
         if (userRepository.existsUserByEmail(dto.getEmail())) {
             throw new UserAlreadyExistsException("Email already in use");
         }
@@ -57,12 +66,13 @@ public class AuthService {
             user.setWebsite(null);
         }
 
-        userRepository.save(user);
-        userService.sendVerificationEmail(user);
+        User savedUser = userRepository.save(user);
+        userService.sendVerificationEmail(savedUser);
+        return userMapper.toRegisterRes(savedUser);
     }
 
     @Transactional
-    public String login(UserLoginDTO dto) {
+    public String login(UserLoginDTO dto, HttpServletResponse response) {
         User user = userRepository.findByEmail((dto.getEmail()));
         if(user == null) {
             throw new UserNotFoundException("User with " + dto.getEmail() + " mail not found.");
@@ -72,9 +82,46 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid credentials");
         }
 
+        long maxRefreshAge;
         if(dto.isStayLogin()){
-            return JwtUtil.genToken(String.valueOf(user.getId()), user.getRole(), TIME.ONEMONTH);
+            maxRefreshAge = TIME.WEEK;
+        } else {
+            maxRefreshAge = TIME.ONEDAY;
         }
-        return JwtUtil.genToken(String.valueOf(user.getId()), user.getRole());
+
+        String refreshToken = JwtUtil.genRefreshToken(user.getId(), maxRefreshAge);
+
+        Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(appProp.isUseHttps());
+        cookie.setPath("/auth/refresh");
+        cookie.setMaxAge((int) (maxRefreshAge / 1000));
+        response.addCookie(cookie);
+
+        redis.opsForValue().set("refresh:" + user.getId(), refreshToken, maxRefreshAge, TimeUnit.MILLISECONDS);
+
+        return JwtUtil.genToken(user.getId(), user.getRole());
+    }
+
+    public String refreshToken(String refreshToken, HttpServletResponse response) {
+        String userId = JwtUtil.validateRefreshToken(refreshToken);
+        String storedRedis = redis.opsForValue().get("refresh:" + userId);
+        if (!refreshToken.equals(storedRedis)) {
+            throw new InvalidRefreshTokenException("Invalid refresh token.");
+        }
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
+
+        String newRefresh = JwtUtil.genRefreshToken(user.getId(), TIME.THREEDAYS);
+        redis.opsForValue().set("refresh:" + userId, newRefresh, TIME.THREEDAYS, TimeUnit.MILLISECONDS);
+
+        Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, newRefresh);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(appProp.isUseHttps());
+        cookie.setPath("/auth/refresh");
+        cookie.setMaxAge((int) (TIME.THREEDAYS / 1000));
+        response.addCookie(cookie);
+
+        return JwtUtil.genToken(userId, user.getRole());
     }
 }

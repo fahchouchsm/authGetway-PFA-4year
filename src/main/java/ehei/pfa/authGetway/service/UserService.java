@@ -29,7 +29,7 @@ public class UserService {
 
     @Transactional
     public void verifyEmailLink(String token) {
-        Long userId =  verificationToken.consumeToken(token);
+        String userId = verificationToken.consumeToken(token);
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("The user was no found."));
         user.setEmailVerified(true);
         userRepository.save(user);
