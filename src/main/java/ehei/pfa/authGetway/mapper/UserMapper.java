@@ -22,7 +22,7 @@ public class UserMapper {
         return new UserLoginDTO(dto.getEmail(), dto.getPassword(), true);
     }
 
-    public RegisterResDTO toRegisterRes(User user) {
+    public RegisterResDTO toRegisterRes(User user, String accessToken) {
         return new RegisterResDTO(
                 user.getId(),
                 user.getName(),
@@ -30,7 +30,8 @@ public class UserMapper {
                 user.getEmail(),
                 user.isEmailVerified(),
                 user.getRole(),
-                user.getWebsite()
+                user.getWebsite(),
+                accessToken
         );
     }
 }

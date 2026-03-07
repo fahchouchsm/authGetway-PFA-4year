@@ -14,5 +14,5 @@ public class RegisterResDTO {
     private boolean emailVerified;
     private UserRole role;
     private String website;
+    private String accessToken;
 }
-

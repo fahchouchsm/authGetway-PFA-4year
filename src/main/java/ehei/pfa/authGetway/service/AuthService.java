@@ -44,7 +44,7 @@ public class AuthService {
     }
 
     @Transactional
-    public RegisterResDTO register(RegisterDTO dto) {
+    public RegisterResDTO register(RegisterDTO dto, HttpServletResponse response) {
         if (userRepository.existsUserByEmail(dto.getEmail())) {
             throw new UserAlreadyExistsException("Email already in use");
         }
@@ -67,7 +67,19 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
         userService.sendVerificationEmail(savedUser);
-        return userMapper.toRegisterRes(savedUser);
+
+        String refreshToken = JwtUtil.genRefreshToken(savedUser.getId(), TIME.ONEDAY);
+        Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(appProp.isUseHttps());
+        cookie.setPath("/auth/refresh");
+        cookie.setMaxAge((int) (TIME.ONEDAY / 1000));
+        response.addCookie(cookie);
+
+        redis.opsForValue().set("refresh:" + savedUser.getId(), refreshToken, TIME.ONEDAY, TimeUnit.MILLISECONDS);
+
+        String accessToken = JwtUtil.genToken(savedUser.getId(), savedUser.getRole());
+        return userMapper.toRegisterRes(savedUser, accessToken);
     }
 
     @Transactional

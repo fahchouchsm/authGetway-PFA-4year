@@ -24,11 +24,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<RegisterResDTO>> register(@Valid @RequestBody RegisterDTO dto)  {
-        RegisterResDTO createdUser = authService.register(dto);
-        ApiResponse<RegisterResDTO> res = ApiResponse.success("User created.", createdUser);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    public ResponseEntity<ApiResponse<RegisterResDTO>> register(@Valid @RequestBody RegisterDTO dto, HttpServletResponse response) {
+        RegisterResDTO createdUser = authService.register(dto, response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("User created.", createdUser));
     }
 
     @PostMapping("/login")
