@@ -23,9 +23,4 @@ public class UserController {
         userService.verifyEmailLink(token);
         return new RedirectView(frontendUrl + "/verified");
     }
-
-    @GetMapping("/hello")
-    public String hello(Authentication auth) {
-        return "Hello user " + auth.getName();
-    }
 }
