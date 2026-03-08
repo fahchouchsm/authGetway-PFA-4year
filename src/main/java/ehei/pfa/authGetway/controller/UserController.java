@@ -23,4 +23,10 @@ public class UserController {
         userService.verifyEmailLink(token);
         return new RedirectView(frontendUrl + "/verified");
     }
+
+    @GetMapping
+    public String hello() {
+        System.out.println("im on the hello controller");
+        return "hello world";
+    }
 }

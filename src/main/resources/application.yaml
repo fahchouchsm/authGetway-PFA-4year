@@ -14,6 +14,16 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
 
+  springdoc:
+    swagger-ui:
+      urls:
+        - name: jobfinder
+          url: /jobs/v3/api-docs
+        - name: eventhandler
+          url: /events/v3/api-docs
+    api-docs:
+      enabled: true
+
   cloud:
     gateway:
       routes:

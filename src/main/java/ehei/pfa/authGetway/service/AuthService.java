@@ -121,16 +121,20 @@ public class AuthService {
             throw new InvalidRefreshTokenException("Invalid refresh token.");
         }
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
 
-        String newRefresh = JwtUtil.genRefreshToken(user.getId(), TIME.THREEDAYS);
-        redis.opsForValue().set("refresh:" + userId, newRefresh, TIME.THREEDAYS, TimeUnit.MILLISECONDS);
+        Long remainingTtl = redis.getExpire("refresh:" + userId, TimeUnit.MILLISECONDS);
+        long ttl = (remainingTtl != null && remainingTtl > 0) ? remainingTtl : TIME.ONEDAY;
+
+        String newRefresh = JwtUtil.genRefreshToken(user.getId(), ttl);
+        redis.opsForValue().set("refresh:" + userId, newRefresh, ttl, TimeUnit.MILLISECONDS);
 
         Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, newRefresh);
         cookie.setHttpOnly(true);
         cookie.setSecure(appProp.isUseHttps());
         cookie.setPath("/auth/refresh");
-        cookie.setMaxAge((int) (TIME.THREEDAYS / 1000));
+        cookie.setMaxAge((int) (ttl / 1000));
         response.addCookie(cookie);
 
         return JwtUtil.genToken(userId, user.getRole());

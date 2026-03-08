@@ -1,0 +1,17 @@
+info:
+  name: hello
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{ip}}/user/hello"
+  auth:
+    type: bearer
+    token: eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtbWg0bGE2Zi0yNTU2ZDk5YWMyM2VmYWNjYzcwMmQyOWMiLCJpZCI6Im1taDRsYTZmLTI1NTZkOTlhYzIzZWZhY2NjNzAyZDI5YyIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzcyOTM3NzAzLCJleHAiOjE3NzI5NDEzMDN9.dyvjJdaUsrg1hpd0Fv76Ny0YNwB09RB--x_VpVFK0JnIVPaNhgRFL5dkoiLniNP2IBUfQF0axnLJ8ktMyNf6M1p8yjNrJqRb0jRxZQ-ED5YAtfFCkxyg2jCi-vBtLdzcMcQZr18qKQ3Dz0bFDFASSTF5tilZxwAceL9V-lGYQk5BiEMvdfw6afzgI4MDrwq3wgdn_ds3c3_d2GYR5By-NKcGpTAdwbiEntgguz-6yo-VBkQgdoP0_LYLutu6ANqRyvQkUD5f_AeJwItjCf20EiHsvDIuhFO8BhMSNO8fzYaHyqtBoyq9e06GGRjQ7UW8zHdwxcHYO4hyw7o2xdUPyg
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

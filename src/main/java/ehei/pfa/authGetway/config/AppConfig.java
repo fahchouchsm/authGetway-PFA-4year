@@ -41,12 +41,15 @@ public class AppConfig {
                                 "/auth/login",
                                 "/auth/refresh",
                                 "/user/verify/email",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
                                 "/jwt/public_key"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(reqLogFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(reqLogFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
