@@ -18,6 +18,7 @@ import ehei.pfa.authGetway.security.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,101 +26,63 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
+
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
     private final UserMapper userMapper;
     private final UserService userService;
     private final StringRedisTemplate redis;
     private final AppProperties appProp;
-
-
-    public AuthService(UserRepository userRepository, BCryptPasswordEncoder encoder, UserMapper userMapper, UserService userService, StringRedisTemplate redis, AppProperties appProp) {
-        this.userRepository = userRepository;
-        this.encoder = encoder;
-        this.userMapper = userMapper;
-        this.userService = userService;
-        this.redis = redis;
-        this.appProp = appProp;
-    }
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public RegisterResDTO register(RegisterDTO dto, HttpServletResponse response) {
-        if (userRepository.existsUserByEmail(dto.getEmail())) {
+        if (userRepository.existsUserByEmail(dto.getEmail()))
             throw new UserAlreadyExistsException("Email already in use");
-        }
 
         UserRole role = (dto.getRole() == null) ? UserRole.USER : dto.getRole();
 
-        if (role == UserRole.COMPANY) {
-            if (dto.getWebsite() == null || dto.getWebsite().trim().isEmpty()) {
-                throw new InvalidCredentialsException("Website required for company.");
-            }
-        }
+        if (role == UserRole.COMPANY && (dto.getWebsite() == null || dto.getWebsite().trim().isEmpty()))
+            throw new InvalidCredentialsException("Website required for company.");
 
         User user = userMapper.toEntity(dto);
         user.setRole(role);
         user.setPassword(encoder.encode(dto.getPassword()));
-
-        if (role != UserRole.COMPANY) {
-            user.setWebsite(null);
-        }
+        if (role != UserRole.COMPANY) user.setWebsite(null);
 
         User savedUser = userRepository.save(user);
         userService.sendVerificationEmail(savedUser);
 
-        String refreshToken = JwtUtil.genRefreshToken(savedUser.getId(), TIME.ONEDAY);
-        Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(appProp.isUseHttps());
-        cookie.setPath("/auth/refresh");
-        cookie.setMaxAge((int) (TIME.ONEDAY / 1000));
-        response.addCookie(cookie);
-
+        String refreshToken = jwtUtil.genRefreshToken(savedUser.getId(), TIME.ONEDAY);
+        setRefreshCookie(response, refreshToken, TIME.ONEDAY);
         redis.opsForValue().set("refresh:" + savedUser.getId(), refreshToken, TIME.ONEDAY, TimeUnit.MILLISECONDS);
 
-        String accessToken = JwtUtil.genToken(savedUser.getId(), savedUser.getRole());
+        String accessToken = jwtUtil.genToken(savedUser.getId(), savedUser.getRole());
         return userMapper.toRegisterRes(savedUser, accessToken);
     }
 
     @Transactional
     public String login(UserLoginDTO dto, HttpServletResponse response) {
-        User user = userRepository.findByEmail((dto.getEmail()));
-        if(user == null) {
-            throw new UserNotFoundException("User with " + dto.getEmail() + " mail not found.");
-        }
+        User user = userRepository.findByEmail(dto.getEmail());
+        if (user == null) throw new UserNotFoundException("User with " + dto.getEmail() + " not found.");
+        if (!encoder.matches(dto.getPassword(), user.getPassword())) throw new InvalidCredentialsException("Invalid credentials");
 
-        if(!encoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid credentials");
-        }
+        long ttl = dto.isStayLogin() ? TIME.WEEK : TIME.ONEDAY;
 
-        long maxRefreshAge;
-        if(dto.isStayLogin()){
-            maxRefreshAge = TIME.WEEK;
-        } else {
-            maxRefreshAge = TIME.ONEDAY;
-        }
+        String refreshToken = jwtUtil.genRefreshToken(user.getId(), ttl);
+        setRefreshCookie(response, refreshToken, ttl);
+        redis.opsForValue().set("refresh:" + user.getId(), refreshToken, ttl, TimeUnit.MILLISECONDS);
 
-        String refreshToken = JwtUtil.genRefreshToken(user.getId(), maxRefreshAge);
-
-        Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(appProp.isUseHttps());
-        cookie.setPath("/auth/refresh");
-        cookie.setMaxAge((int) (maxRefreshAge / 1000));
-        response.addCookie(cookie);
-
-        redis.opsForValue().set("refresh:" + user.getId(), refreshToken, maxRefreshAge, TimeUnit.MILLISECONDS);
-
-        return JwtUtil.genToken(user.getId(), user.getRole());
+        return jwtUtil.genToken(user.getId(), user.getRole());
     }
 
     public String refreshToken(String refreshToken, HttpServletResponse response) {
-        String userId = JwtUtil.validateRefreshToken(refreshToken);
-        String storedRedis = redis.opsForValue().get("refresh:" + userId);
-        if (!refreshToken.equals(storedRedis)) {
-            throw new InvalidRefreshTokenException("Invalid refresh token.");
-        }
+        String userId = jwtUtil.validateRefreshToken(refreshToken);
+        String stored = redis.opsForValue().get("refresh:" + userId);
+
+        if (!refreshToken.equals(stored)) throw new InvalidRefreshTokenException("Invalid refresh token.");
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
@@ -127,16 +90,35 @@ public class AuthService {
         Long remainingTtl = redis.getExpire("refresh:" + userId, TimeUnit.MILLISECONDS);
         long ttl = (remainingTtl != null && remainingTtl > 0) ? remainingTtl : TIME.ONEDAY;
 
-        String newRefresh = JwtUtil.genRefreshToken(user.getId(), ttl);
+        String newRefresh = jwtUtil.genRefreshToken(userId, ttl);
+        setRefreshCookie(response, newRefresh, ttl);
         redis.opsForValue().set("refresh:" + userId, newRefresh, ttl, TimeUnit.MILLISECONDS);
 
-        Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, newRefresh);
+        return jwtUtil.genToken(userId, user.getRole());
+    }
+
+    public void logout(String accessToken, String refreshToken, HttpServletResponse response) {
+        var claims = jwtUtil.parseClaims(accessToken);
+        long ttl = claims.getExpiration().getTime() - System.currentTimeMillis();
+        redis.opsForValue().set("blacklist:" + accessToken, "revoked", ttl, TimeUnit.MILLISECONDS);
+
+        String userId = claims.getSubject();
+        redis.delete("refresh:" + userId);
+
+        Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, "");
+        cookie.setMaxAge(0);
+        cookie.setPath("/auth/refresh");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(appProp.isUseHttps());
+        response.addCookie(cookie);
+    }
+
+    private void setRefreshCookie(HttpServletResponse response, String token, long ttlMillis) {
+        Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, token);
         cookie.setHttpOnly(true);
         cookie.setSecure(appProp.isUseHttps());
         cookie.setPath("/auth/refresh");
-        cookie.setMaxAge((int) (ttl / 1000));
+        cookie.setMaxAge((int) (ttlMillis / 1000));
         response.addCookie(cookie);
-
-        return JwtUtil.genToken(userId, user.getRole());
     }
 }

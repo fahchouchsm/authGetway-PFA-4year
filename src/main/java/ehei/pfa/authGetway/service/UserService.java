@@ -6,31 +6,32 @@ import ehei.pfa.authGetway.database.repository.UserRepository;
 import ehei.pfa.authGetway.exception.UserNotFoundException;
 import ehei.pfa.authGetway.security.VerificationToken;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
+
     private final MailService mailService;
     private final VerificationToken verificationToken;
     private final UserRepository userRepository;
 
-    public UserService(MailService mailService, VerificationToken verificationToken, UserRepository userRepository) {
-        this.mailService = mailService;
-        this.verificationToken = verificationToken;
-        this.userRepository = userRepository;
-    }
-
     public void sendVerificationEmail(User user) {
         String token = verificationToken.createToken(user.getId());
-        String link = ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/verify/email").queryParam("token", token).toUriString();
+        String link = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/user/verify/email")
+                .queryParam("token", token)
+                .toUriString();
         mailService.sendVerificationEmail(user.getEmail(), new RegisterEmailDTO(link, user.getName(), user.getLastName()));
     }
 
     @Transactional
     public void verifyEmailLink(String token) {
         String userId = verificationToken.consumeToken(token);
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("The user was no found."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
         user.setEmailVerified(true);
         userRepository.save(user);
     }

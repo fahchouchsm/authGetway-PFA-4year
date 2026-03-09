@@ -1,22 +1,19 @@
 package ehei.pfa.authGetway.controller;
 
 import ehei.pfa.authGetway.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController {
+
     @Value("${app.frontend-url}")
     private String frontendUrl;
-    private UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserService userService;
 
     @GetMapping("/verify/email")
     public RedirectView verifyEmail(@RequestParam String token) {
@@ -26,7 +23,6 @@ public class UserController {
 
     @GetMapping
     public String hello() {
-        System.out.println("im on the hello controller");
         return "hello world";
     }
 }

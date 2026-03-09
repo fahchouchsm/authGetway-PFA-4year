@@ -26,19 +26,12 @@ spring:
 
   cloud:
     gateway:
-      routes:
-        - id: jobfinder
-          uri: http://jobfinder-service:8081
-          predicates:
-            - Path=/jobs/**
-          filters:
-            - StripPrefix=1
-        - id: eventhandler
-          uri: http://eventhandler-service:8082
-          predicates:
-            - Path=/events/**
-          filters:
-            - StripPrefix=1
+      mvc:
+        routes:
+          - id: dotnet-service
+            uri: http://localhost:8085
+            predicates:
+              - Path=/api/**
   data:
     redis:
       host: localhost
@@ -61,3 +54,5 @@ app:
   mail:
     from: simofff0@gmail.com
   use-https: false
+  jwt-secret: "dGhpcyBpcyBhIGRldiBzZWNyZXQga2V5IGZvciBkZXZlbG9wbWVudA=="
+  jwt-refresh-secret: "dGhpcyBpcyBhIGRldmVsb3BtZW50IHJlZnJlc2gga2V5IGZvciBkZXY="

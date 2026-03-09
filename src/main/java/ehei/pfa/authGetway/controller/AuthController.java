@@ -10,18 +10,17 @@ import ehei.pfa.authGetway.constant.COOKIE;
 import ehei.pfa.authGetway.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
 
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterResDTO>> register(@Valid @RequestBody RegisterDTO dto, HttpServletResponse response) {
@@ -38,13 +37,19 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<RefreshResDTO>> refresh(
             @CookieValue(name = COOKIE.REFRESHTOKEN, required = false) String refreshToken,
-            HttpServletResponse response
-            ) {
-
+            HttpServletResponse response) {
         if (refreshToken == null)
             return ResponseEntity.status(401).body(ApiResponse.error("Refresh token missing."));
-
         String newAccessToken = authService.refreshToken(refreshToken, response);
         return ResponseEntity.ok(ApiResponse.success("Token refreshed.", new RefreshResDTO(newAccessToken)));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @RequestHeader("Authorization") String authHeader,
+            @CookieValue(name = COOKIE.REFRESHTOKEN, required = false) String refreshToken,
+            HttpServletResponse response) {
+        authService.logout(authHeader.substring(7), refreshToken, response);
+        return ResponseEntity.ok(ApiResponse.success("Logged out.", null));
     }
 }

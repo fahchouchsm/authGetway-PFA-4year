@@ -11,4 +11,6 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class AppProperties {
     private boolean useHttps = false;
+    private String jwtSecret;
+    private String jwtRefreshSecret;
 }

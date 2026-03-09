@@ -1,42 +1,61 @@
 package ehei.pfa.authGetway.security;
 
+import ehei.pfa.authGetway.config.AppProperties;
 import ehei.pfa.authGetway.constant.TIME;
 import ehei.pfa.authGetway.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import lombok.Getter;
-import java.security.*;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.Date;
 
+@Component
+@RequiredArgsConstructor
 public class JwtUtil {
-    private static final KeyPair keyPair = generateKeyPair();
-    private static final PrivateKey privateKey = keyPair.getPrivate();
-    @Getter
-    private static final PublicKey publicKey = keyPair.getPublic();
-    // refresh token
-    private static final Key refreshKey = generateHS256Key();
 
-    private static Key generateHS256Key() {
-        try {
-            return Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to generate HS256 key", ex);
-        }
+    private final AppProperties appProperties;
+    private SecretKey signingKey;
+    private SecretKey refreshKey;
+
+    @PostConstruct
+    public void init() {
+        signingKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(appProperties.getJwtSecret()));
+        refreshKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(appProperties.getJwtRefreshSecret()));
     }
 
-    public static String genRefreshToken(String userId, long exp) {
+    public String genToken(String userId, UserRole role, long expMillis) {
+        Date now = new Date();
+        return Jwts.builder()
+                .setSubject(userId)
+                .claim("id", userId)
+                .claim("role", role.name())
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + expMillis))
+                .signWith(signingKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String genToken(String userId, UserRole role) {
+        return genToken(userId, role, TIME.ONEHOUR);
+    }
+
+    public String genRefreshToken(String userId, long expMillis) {
         Date now = new Date();
         return Jwts.builder()
                 .setSubject(userId)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + exp))
+                .setExpiration(new Date(now.getTime() + expMillis))
                 .signWith(refreshKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public static String validateRefreshToken(String token) {
+    public String validateRefreshToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(refreshKey)
                 .build()
@@ -44,45 +63,10 @@ public class JwtUtil {
                 .getBody()
                 .getSubject();
     }
-    private static KeyPair generateKeyPair() {
-        try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(2048);
-            return generator.generateKeyPair();
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to generate RS256 key pair", ex);
-        }
-    }
 
-    public static String genToken(String userId, UserRole role, long expMillis) {
-        Date now = new Date();
-
-        return Jwts.builder()
-                .setSubject(userId)
-                .claim("id",userId)
-                .claim("role", role.name())
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + expMillis))
-                .signWith(privateKey, SignatureAlgorithm.RS256)
-                .compact();
-    }
-
-    public static String genToken(String userId, UserRole role) {
-        return genToken(userId, role, TIME.ONEHOUR);
-    }
-
-    public static String validateToken(String token) {
+    public Claims parseClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(publicKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    public static Claims parseClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(publicKey)
+                .setSigningKey(signingKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
