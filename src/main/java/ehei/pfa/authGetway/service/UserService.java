@@ -3,6 +3,7 @@ package ehei.pfa.authGetway.service;
 import ehei.pfa.authGetway.DTO.email.RegisterEmailDTO;
 import ehei.pfa.authGetway.database.entity.User;
 import ehei.pfa.authGetway.database.repository.UserRepository;
+import ehei.pfa.authGetway.exception.UserAlreadyVerifiedException;
 import ehei.pfa.authGetway.exception.UserNotFoundException;
 import ehei.pfa.authGetway.security.VerificationToken;
 import jakarta.transaction.Transactional;
@@ -19,6 +20,10 @@ public class UserService {
     private final UserRepository userRepository;
 
     public void sendVerificationEmail(User user) {
+        if (user.isEmailVerified()) {
+            throw new UserAlreadyVerifiedException("User email already verified.");
+        }
+
         String token = verificationToken.createToken(user.getId());
         String link = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/user/verify/email")
