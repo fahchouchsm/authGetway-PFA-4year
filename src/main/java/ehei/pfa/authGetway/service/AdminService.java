@@ -1,4 +1,10 @@
 package ehei.pfa.authGetway.service;
 
-public class Admin {
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AdminService {
+
 }

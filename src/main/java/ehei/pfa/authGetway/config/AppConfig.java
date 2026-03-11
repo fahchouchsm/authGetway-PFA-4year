@@ -1,5 +1,6 @@
 package ehei.pfa.authGetway.config;
 
+import ehei.pfa.authGetway.enums.UserRole;
 import ehei.pfa.authGetway.filters.JwtAuthFilter;
 import ehei.pfa.authGetway.filters.ReqLogFilter;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,7 @@ public class AppConfig {
                                 "/v3/api-docs/**",
                                 "/jwt/public_key"
                         ).permitAll()
+                        .requestMatchers("/admin/**").hasRole(UserRole.ADMIN.name())
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
