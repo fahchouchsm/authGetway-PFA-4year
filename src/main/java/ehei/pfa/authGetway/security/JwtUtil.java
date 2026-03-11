@@ -9,6 +9,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -33,7 +34,7 @@ public class JwtUtil {
         Date now = new Date();
         return Jwts.builder()
                 .setSubject(userId)
-                .claim("id", userId)
+//                .claim("id", userId)
                 .claim("role", role.name())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + expMillis))
@@ -70,5 +71,9 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public static String getRole(Authentication authentication) {
+        return authentication.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
     }
 }

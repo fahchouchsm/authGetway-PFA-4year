@@ -34,6 +34,15 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Login successful.", new LoginResDTO(accessToken)));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @RequestHeader("Authorization") String authHeader,
+            @CookieValue(name = COOKIE.REFRESHTOKEN, required = false) String refreshToken,
+            HttpServletResponse response) {
+        authService.logout(authHeader.substring(7), refreshToken, response);
+        return ResponseEntity.ok(ApiResponse.success("Logged out.", null));
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<RefreshResDTO>> refresh(
             @CookieValue(name = COOKIE.REFRESHTOKEN, required = false) String refreshToken,
@@ -44,12 +53,6 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Token refreshed.", new RefreshResDTO(newAccessToken)));
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(
-            @RequestHeader("Authorization") String authHeader,
-            @CookieValue(name = COOKIE.REFRESHTOKEN, required = false) String refreshToken,
-            HttpServletResponse response) {
-        authService.logout(authHeader.substring(7), refreshToken, response);
-        return ResponseEntity.ok(ApiResponse.success("Logged out.", null));
-    }
+//    @GetMapping("/reset/password")
+//    public ResponseEntity<Void> resetPassword()
 }

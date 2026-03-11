@@ -1,16 +1,27 @@
 package ehei.pfa.authGetway.controller;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import ehei.pfa.authGetway.DTO.RoleDTO;
+import ehei.pfa.authGetway.DTO.res.ApiResponse;
+import ehei.pfa.authGetway.DTO.res.UserResDTO;
+import ehei.pfa.authGetway.service.AdminService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin")
+@RequiredArgsConstructor
 public class AdminController {
-    @GetMapping("/test")
-    public String test(Authentication authentication) {
-        System.out.println(authentication.getPrincipal());
-        return "helo";
+    private final AdminService adminService;
+
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+        adminService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/user/role/{id}")
+    public ResponseEntity<ApiResponse<UserResDTO>> changeRole(@PathVariable String id, @RequestBody RoleDTO roleDTO) {
+        return ResponseEntity.ok(ApiResponse.success("User role updated.", adminService.changeRole(id, roleDTO.getUserRole())));
     }
 }

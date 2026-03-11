@@ -3,6 +3,7 @@ package ehei.pfa.authGetway.mapper;
 import ehei.pfa.authGetway.DTO.RegisterDTO;
 import ehei.pfa.authGetway.DTO.UserLoginDTO;
 import ehei.pfa.authGetway.DTO.res.RegisterResDTO;
+import ehei.pfa.authGetway.DTO.res.UserResDTO;
 import ehei.pfa.authGetway.database.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -33,5 +34,15 @@ public class UserMapper {
                 user.getWebsite(),
                 accessToken
         );
+    }
+
+    public UserResDTO toUserResDTO(User user) {
+        return new UserResDTO(
+                user.getId(),
+                user.getName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.isEmailVerified(),
+                user.getRole());
     }
 }
