@@ -1,6 +1,0 @@
-name: auth
-variables:
-  - name: ip
-    value: http://localhost:8080
-  - secret: true
-    name: token
