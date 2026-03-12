@@ -21,7 +21,7 @@ public class UserController {
         return new RedirectView(frontendUrl + "/verified");
     }
 
-    @GetMapping
+    @GetMapping("/hello")
     public String hello() {
         return "hello world";
     }

@@ -20,7 +20,7 @@ public class GatewayConfig {
     @Order(Ordered.LOWEST_PRECEDENCE)
     public RouterFunction<ServerResponse> routes() {
         return GatewayRouterFunctions.route("dotnet-service")
-                .route(request -> request.path().startsWith("/api/"), HandlerFunctions.http())
+                .route(request -> request.path().startsWith("/api/city/"), HandlerFunctions.http())
                 .before(BeforeFilterFunctions.uri("http://localhost:8085"))
                 .before(request -> {
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
