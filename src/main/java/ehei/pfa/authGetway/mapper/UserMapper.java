@@ -1,7 +1,7 @@
 package ehei.pfa.authGetway.mapper;
 
+import ehei.pfa.authGetway.DTO.AdminCreateUserDTO;
 import ehei.pfa.authGetway.DTO.RegisterDTO;
-import ehei.pfa.authGetway.DTO.UserLoginDTO;
 import ehei.pfa.authGetway.DTO.res.RegisterResDTO;
 import ehei.pfa.authGetway.DTO.res.UserResDTO;
 import ehei.pfa.authGetway.database.entity.User;
@@ -19,8 +19,13 @@ public class UserMapper {
         return user;
     }
 
-    public UserLoginDTO fromUserRegisterToUserLogin(RegisterDTO dto) {
-        return new UserLoginDTO(dto.getEmail(), dto.getPassword(), true);
+    public User toEntity(AdminCreateUserDTO dto) {
+        User user = new User();
+        user.setName(dto.getName());
+        user.setLastName(dto.getLastName());
+        user.setEmail(dto.getEmail());
+        user.setWebsite(dto.getWebsite());
+        return user;
     }
 
     public RegisterResDTO toRegisterRes(User user, String accessToken) {
