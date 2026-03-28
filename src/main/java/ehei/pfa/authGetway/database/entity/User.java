@@ -26,6 +26,9 @@ public class User {
     @Column(nullable = false)
     private boolean emailVerified = false;
 
+    @Column(nullable = true, unique = true)
+    private String pfpLink = null;
+
     @Column(nullable = false)
     private String password;
 
@@ -45,4 +48,8 @@ public class User {
             role = UserRole.USER;
         }
     }
- }
+
+    public Object getroe() {
+        return null;
+    }
+}

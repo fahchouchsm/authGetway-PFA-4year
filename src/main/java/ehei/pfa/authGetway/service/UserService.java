@@ -1,10 +1,13 @@
 package ehei.pfa.authGetway.service;
 
 import ehei.pfa.authGetway.DTO.email.RegisterEmailDTO;
+import ehei.pfa.authGetway.DTO.res.MeDTO;
 import ehei.pfa.authGetway.database.entity.User;
 import ehei.pfa.authGetway.database.repository.UserRepository;
+import ehei.pfa.authGetway.enums.UserRole;
 import ehei.pfa.authGetway.exception.UserAlreadyVerifiedException;
 import ehei.pfa.authGetway.exception.UserNotFoundException;
+import ehei.pfa.authGetway.mapper.UserMapper;
 import ehei.pfa.authGetway.security.VerificationToken;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ public class UserService {
     private final MailService mailService;
     private final VerificationToken verificationToken;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public void sendVerificationEmail(User user) {
         if (user.isEmailVerified()) {
@@ -39,5 +43,16 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
         user.setEmailVerified(true);
         userRepository.save(user);
+    }
+
+    public MeDTO getMe(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
+
+        if(user.getRole() == UserRole.COMPANY) {
+            return userMapper.toMeDTOCompany(user);
+        }
+
+        return userMapper.toMeDTOUserOrAdmin(user);
     }
 }

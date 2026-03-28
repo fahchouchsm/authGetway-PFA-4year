@@ -31,7 +31,7 @@ spring:
           - id: dotnet-service
             uri: http://localhost:8085
             predicates:
-              - Path=/api/**
+              - Path=/api/city/**
   data:
     redis:
       host: localhost
@@ -50,7 +50,7 @@ spring:
             enable: true
 
 app:
-  frontend-url: localhost:3000
+  frontend-url: http://localhost:3000
   mail:
     from: simofff0@gmail.com
   use-https: false

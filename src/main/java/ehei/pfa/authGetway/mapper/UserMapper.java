@@ -2,9 +2,11 @@ package ehei.pfa.authGetway.mapper;
 
 import ehei.pfa.authGetway.DTO.AdminCreateUserDTO;
 import ehei.pfa.authGetway.DTO.RegisterDTO;
+import ehei.pfa.authGetway.DTO.res.MeDTO;
 import ehei.pfa.authGetway.DTO.res.RegisterResDTO;
 import ehei.pfa.authGetway.DTO.res.UserResDTO;
 import ehei.pfa.authGetway.database.entity.User;
+import ehei.pfa.authGetway.enums.UserRole;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -49,5 +51,28 @@ public class UserMapper {
                 user.getEmail(),
                 user.isEmailVerified(),
                 user.getRole());
+    }
+
+    public MeDTO toMeDTOUserOrAdmin(User user) {
+        return new MeDTO(
+                user.getName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.isEmailVerified(),
+                user.getPfpLink(),
+                user.getRole()
+        );
+    }
+
+    public MeDTO toMeDTOCompany(User user) {
+        return new MeDTO(
+                user.getName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.isEmailVerified(),
+                user.getPfpLink(),
+                UserRole.COMPANY,
+                user.getWebsite()
+        );
     }
 }

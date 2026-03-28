@@ -105,20 +105,19 @@ public class AuthService {
         String userId = claims.getSubject();
         redis.delete("refresh:" + userId);
 
-        Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, "");
-        cookie.setMaxAge(0);
-        cookie.setPath("/auth/refresh");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(appProp.isUseHttps());
-        response.addCookie(cookie);
+        response.addHeader("Set-Cookie", String.format(
+                "%s=; Max-Age=0; Path=/auth; HttpOnly; SameSite=Lax",
+                COOKIE.REFRESHTOKEN
+        ));
     }
 
     private void setRefreshCookie(HttpServletResponse response, String token, long ttlMillis) {
-        Cookie cookie = new Cookie(COOKIE.REFRESHTOKEN, token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(appProp.isUseHttps());
-        cookie.setPath("/auth/refresh");
-        cookie.setMaxAge((int) (ttlMillis / 1000));
-        response.addCookie(cookie);
+        String cookie = String.format(
+                "%s=%s; Max-Age=%d; Path=/auth; HttpOnly; SameSite=Lax",
+                COOKIE.REFRESHTOKEN,
+                token,
+                (int) (ttlMillis / 1000)
+        );
+        response.addHeader("Set-Cookie", cookie);
     }
 }
