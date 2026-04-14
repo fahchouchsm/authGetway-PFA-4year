@@ -1,9 +1,9 @@
 server:
-  port: 8080
+  port: 8082
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/authgetway}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3310/smartcity}
     username: ${SPRING_DATASOURCE_USERNAME:auth}
     password: ${SPRING_DATASOURCE_PASSWORD:auth}
 
