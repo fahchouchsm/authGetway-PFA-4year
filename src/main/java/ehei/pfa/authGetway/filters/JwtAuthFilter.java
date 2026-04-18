@@ -21,12 +21,34 @@ public class JwtAuthFilter implements Filter {
     private final JwtUtil jwtUtil;
     private final StringRedisTemplate redis;
 
+    private static final List<String> PUBLIC_PATHS = List.of(
+            "/auth/register",
+            "/auth/login",
+            "/auth/refresh",
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/refresh",
+            "/user/verify/email",
+            "/swagger-ui",
+            "/v3/api-docs",
+            "/jwt/public_key",
+            "/api/city/"
+    );
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
+
+        String path = request.getRequestURI();
+        boolean isPublic = PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+        if (isPublic) {
+            chain.doFilter(req, res);
+            return;
+        }
+
         String header = request.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {

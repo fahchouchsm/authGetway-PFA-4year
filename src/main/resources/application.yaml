@@ -29,9 +29,13 @@ spring:
       mvc:
         routes:
           - id: dotnet-service
-            uri: http://localhost:8085
+            uri: http://localhost:5181   # 👈 was 8085, now correct
             predicates:
               - Path=/api/city/**
+          - id: testing-route
+            uri: http://localhost:5181   # 👈 add this for /testing/**
+            predicates:
+              - Path=/testing/**
   data:
     redis:
       host: localhost

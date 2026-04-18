@@ -55,7 +55,8 @@ public class AppConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/jwt/public_key",
-                                "/api/city/**"
+                                "/api/city/**",
+                                "/testing/**"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole(UserRole.ADMIN.name())
                         .requestMatchers("/api/city/**").authenticated()
