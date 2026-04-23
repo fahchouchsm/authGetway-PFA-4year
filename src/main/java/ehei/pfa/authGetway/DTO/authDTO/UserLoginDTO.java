@@ -1,4 +1,4 @@
-package ehei.pfa.authGetway.DTO;
+package ehei.pfa.authGetway.DTO.authDTO;
 
 
 import jakarta.validation.constraints.Email;

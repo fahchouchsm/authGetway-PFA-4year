@@ -1,7 +1,7 @@
 package ehei.pfa.authGetway.service;
 
 import ehei.pfa.authGetway.DTO.RegisterDTO;
-import ehei.pfa.authGetway.DTO.UserLoginDTO;
+import ehei.pfa.authGetway.DTO.authDTO.UserLoginDTO;
 import ehei.pfa.authGetway.DTO.res.RegisterResDTO;
 import ehei.pfa.authGetway.config.AppProperties;
 import ehei.pfa.authGetway.constant.COOKIE;
@@ -15,7 +15,6 @@ import ehei.pfa.authGetway.exception.UserNotFoundException;
 import ehei.pfa.authGetway.mapper.UserMapper;
 import ehei.pfa.authGetway.security.InvalidRefreshTokenException;
 import ehei.pfa.authGetway.security.JwtUtil;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
