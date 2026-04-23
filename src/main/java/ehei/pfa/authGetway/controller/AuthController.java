@@ -23,14 +23,31 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<RegisterResDTO>> register(@Valid @RequestBody RegisterDTO dto, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<RegisterResDTO>> register(
+            @Valid @RequestBody RegisterDTO dto,
+            HttpServletResponse response,
+            @RequestParam(required = false) String redirect) {
         RegisterResDTO createdUser = authService.register(dto, response);
+
+        if(redirect != null && !redirect.isBlank()) {
+            return ResponseEntity.status(HttpStatus.CREATED).header("Location", redirect)
+                    .body(ApiResponse.success("User created.", createdUser));
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("User created.", createdUser));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResDTO>> login(@RequestBody UserLoginDTO dto, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<LoginResDTO>> login(
+            @Valid @RequestBody UserLoginDTO dto,
+            HttpServletResponse response,
+            @RequestParam(required = false) String redirect) {
         String accessToken = authService.login(dto, response);
+        if (redirect != null && !redirect.isBlank()) {
+            return ResponseEntity.ok()
+                    .header("Location", redirect)
+                    .body(ApiResponse.success("Login successful.", new LoginResDTO(accessToken)));
+        }
         return ResponseEntity.ok(ApiResponse.success("Login successful.", new LoginResDTO(accessToken)));
     }
 
@@ -38,8 +55,14 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> logout(
             @RequestHeader("Authorization") String authHeader,
             @CookieValue(name = COOKIE.REFRESHTOKEN, required = false) String refreshToken,
-            HttpServletResponse response) {
+            HttpServletResponse response,
+            @RequestParam(required = false) String redirect) {
         authService.logout(authHeader.substring(7), refreshToken, response);
+        if (redirect != null && !redirect.isBlank()) {
+            return ResponseEntity.ok()
+                    .header("Location", redirect)
+                    .body(ApiResponse.success("Logged out.", null));
+        }
         return ResponseEntity.ok(ApiResponse.success("Logged out.", null));
     }
 
