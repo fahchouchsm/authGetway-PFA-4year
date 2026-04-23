@@ -43,8 +43,6 @@ public class MailService {
     public void sendVerificationEmail(String to, RegisterEmailDTO dto)  {
         Context ctx = new Context();
         ctx.setVariable("actionUrl", dto.getActionUrl());
-        ctx.setVariable("name", dto.getName());
-        ctx.setVariable("lastName", dto.getLastName());
 
         String html = templateEngine.process("mail/verifyEmail", ctx);
 

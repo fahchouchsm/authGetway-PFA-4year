@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class UpdateUserByAdminDTO {
-    private String name;
-    private String lastName;
-    private String website;
+    private String email;
+    private String password;
+    private Boolean verifiedEmail;
 }

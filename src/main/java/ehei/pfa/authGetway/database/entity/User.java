@@ -16,18 +16,11 @@ public class User {
     @Column(nullable = false, updatable = false, length = 64)
     private String id;
 
-    private String name;
-
-    private String lastName;
-
     @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
-    private boolean emailVerified = false;
-
-    @Column(nullable = true, unique = true)
-    private String pfpLink = null;
+    private boolean verifiedEmail = false;
 
     @Column(nullable = false)
     private String password;
@@ -35,9 +28,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
-
-    @Column(length = 255)
-    private String website;
 
     @PrePersist
     void setDefault() {
@@ -49,7 +39,4 @@ public class User {
         }
     }
 
-    public Object getroe() {
-        return null;
-    }
 }

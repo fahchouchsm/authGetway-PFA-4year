@@ -4,7 +4,6 @@ import ehei.pfa.authGetway.DTO.email.RegisterEmailDTO;
 import ehei.pfa.authGetway.DTO.res.MeDTO;
 import ehei.pfa.authGetway.database.entity.User;
 import ehei.pfa.authGetway.database.repository.UserRepository;
-import ehei.pfa.authGetway.enums.UserRole;
 import ehei.pfa.authGetway.exception.UserAlreadyVerifiedException;
 import ehei.pfa.authGetway.exception.UserNotFoundException;
 import ehei.pfa.authGetway.mapper.UserMapper;
@@ -24,7 +23,7 @@ public class UserService {
     private final UserMapper userMapper;
 
     public void sendVerificationEmail(User user) {
-        if (user.isEmailVerified()) {
+        if (user.isVerifiedEmail()) {
             throw new UserAlreadyVerifiedException("User email already verified.");
         }
 
@@ -33,7 +32,7 @@ public class UserService {
                 .path("/user/verify/email")
                 .queryParam("token", token)
                 .toUriString();
-        mailService.sendVerificationEmail(user.getEmail(), new RegisterEmailDTO(link, user.getName(), user.getLastName()));
+        mailService.sendVerificationEmail(user.getEmail(), new RegisterEmailDTO(link));
     }
 
     @Transactional
@@ -41,18 +40,13 @@ public class UserService {
         String userId = verificationToken.consumeToken(token);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
-        user.setEmailVerified(true);
+        user.setVerifiedEmail(true);
         userRepository.save(user);
     }
 
     public MeDTO getMe(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
-
-        if(user.getRole() == UserRole.COMPANY) {
-            return userMapper.toMeDTOCompany(user);
-        }
-
-        return userMapper.toMeDTOUserOrAdmin(user);
+        return userMapper.toMeDTO(user);
     }
 }

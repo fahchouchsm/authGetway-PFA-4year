@@ -7,6 +7,4 @@ import lombok.Getter;
 @Getter
 public class RegisterEmailDTO {
     private String actionUrl;
-    private String name;
-    private String lastName;
 }

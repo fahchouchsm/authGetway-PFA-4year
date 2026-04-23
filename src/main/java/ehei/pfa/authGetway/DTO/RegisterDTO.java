@@ -10,13 +10,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class RegisterDTO {
-
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    private String lastName;
-
     @NotBlank
     @Email
     private String email;
@@ -26,6 +19,4 @@ public class RegisterDTO {
     private String password;
 
     private UserRole role;
-
-    private String website;
 }

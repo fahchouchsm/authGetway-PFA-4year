@@ -40,9 +40,9 @@ public class AdminService {
     public UserResDTO updateUser(String id, UpdateUserByAdminDTO dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
-        if (dto.getName() != null) user.setName(dto.getName());
-        if (dto.getLastName() != null) user.setLastName(dto.getLastName());
-        if (dto.getWebsite() != null) user.setWebsite(dto.getWebsite());
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) user.setEmail(dto.getEmail());
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) user.setPassword(encoder.encode(dto.getPassword()));
+        if (dto.getVerifiedEmail() != null) user.setVerifiedEmail(dto.getVerifiedEmail());
         return userMapper.toUserResDTO(userRepository.save(user));
     }
 
@@ -53,18 +53,14 @@ public class AdminService {
 
         UserRole role = dto.getRole() == null ? UserRole.USER : dto.getRole();
 
-        if (role == UserRole.COMPANY && (dto.getWebsite() == null || dto.getWebsite().isBlank()))
-            throw new InvalidCredentialsException("Website required for company.");
-
         User user = userMapper.toEntity(dto);
         user.setRole(role);
-        user.setEmailVerified(dto.isEmailVerified());
+        user.setVerifiedEmail(dto.isVerifiedEmail());
         user.setPassword(encoder.encode(dto.getPassword()));
-        if (role != UserRole.COMPANY) user.setWebsite(null);
 
         User saved = userRepository.save(user);
 
-        if (!dto.isEmailVerified()) {
+        if (!dto.isVerifiedEmail()) {
             userService.sendVerificationEmail(saved);
         }
 

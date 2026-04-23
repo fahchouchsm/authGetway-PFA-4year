@@ -8,11 +8,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class RegisterResDTO {
     private String id;
-    private String name;
-    private String lastName;
     private String email;
-    private boolean emailVerified;
+    private boolean verifiedEmail;
     private UserRole role;
-    private String website;
     private String accessToken;
 }

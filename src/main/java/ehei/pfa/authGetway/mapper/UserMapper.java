@@ -6,7 +6,6 @@ import ehei.pfa.authGetway.DTO.res.MeDTO;
 import ehei.pfa.authGetway.DTO.res.RegisterResDTO;
 import ehei.pfa.authGetway.DTO.res.UserResDTO;
 import ehei.pfa.authGetway.database.entity.User;
-import ehei.pfa.authGetway.enums.UserRole;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,31 +13,22 @@ public class UserMapper {
 
     public User toEntity(RegisterDTO dto) {
         User user = new User();
-        user.setLastName(dto.getLastName());
-        user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setWebsite(dto.getWebsite());
         return user;
     }
 
     public User toEntity(AdminCreateUserDTO dto) {
         User user = new User();
-        user.setName(dto.getName());
-        user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());
-        user.setWebsite(dto.getWebsite());
         return user;
     }
 
     public RegisterResDTO toRegisterRes(User user, String accessToken) {
         return new RegisterResDTO(
                 user.getId(),
-                user.getName(),
-                user.getLastName(),
                 user.getEmail(),
-                user.isEmailVerified(),
+                user.isVerifiedEmail(),
                 user.getRole(),
-                user.getWebsite(),
                 accessToken
         );
     }
@@ -46,33 +36,16 @@ public class UserMapper {
     public UserResDTO toUserResDTO(User user) {
         return new UserResDTO(
                 user.getId(),
-                user.getName(),
-                user.getLastName(),
                 user.getEmail(),
-                user.isEmailVerified(),
+                user.isVerifiedEmail(),
                 user.getRole());
     }
 
-    public MeDTO toMeDTOUserOrAdmin(User user) {
+    public MeDTO toMeDTO(User user) {
         return new MeDTO(
-                user.getName(),
-                user.getLastName(),
                 user.getEmail(),
-                user.isEmailVerified(),
-                user.getPfpLink(),
+                user.isVerifiedEmail(),
                 user.getRole()
-        );
-    }
-
-    public MeDTO toMeDTOCompany(User user) {
-        return new MeDTO(
-                user.getName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.isEmailVerified(),
-                user.getPfpLink(),
-                UserRole.COMPANY,
-                user.getWebsite()
         );
     }
 }

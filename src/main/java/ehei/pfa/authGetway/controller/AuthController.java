@@ -52,7 +52,4 @@ public class AuthController {
         String newAccessToken = authService.refreshToken(refreshToken, response);
         return ResponseEntity.ok(ApiResponse.success("Token refreshed.", new RefreshResDTO(newAccessToken)));
     }
-
-//    @GetMapping("/reset/password")
-//    public ResponseEntity<Void> resetPassword()
 }

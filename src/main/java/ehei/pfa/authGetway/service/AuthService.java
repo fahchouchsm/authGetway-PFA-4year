@@ -44,13 +44,9 @@ public class AuthService {
 
         UserRole role = (dto.getRole() == null) ? UserRole.USER : dto.getRole();
 
-        if (role == UserRole.COMPANY && (dto.getWebsite() == null || dto.getWebsite().trim().isEmpty()))
-            throw new InvalidCredentialsException("Website required for company.");
-
         User user = userMapper.toEntity(dto);
         user.setRole(role);
         user.setPassword(encoder.encode(dto.getPassword()));
-        if (role != UserRole.COMPANY) user.setWebsite(null);
 
         User savedUser = userRepository.save(user);
         userService.sendVerificationEmail(savedUser);
