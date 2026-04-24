@@ -19,22 +19,35 @@ public class GatewayConfig {
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE)
     public RouterFunction<ServerResponse> routes() {
-        return GatewayRouterFunctions.route("dotnet-service")
-                .route(request -> request.path().startsWith("/api/city/"),
-                        HandlerFunctions.http())
-                .before(BeforeFilterFunctions.uri("http://localhost:5181"))
-                .before(request -> {
-                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                    if (auth != null && auth.isAuthenticated()) {
-                        String userId = (String) auth.getPrincipal();
-                        String role = auth.getAuthorities().iterator().next().getAuthority();
-                        return ServerRequest.from(request)
-                                .header("X-User-Id", userId)
-                                .header("X-User-Role", role)
-                                .build();
-                    }
-                    return request;
-                })
+
+        // Route for .NET City Service
+        RouterFunction<ServerResponse> cityRoute = GatewayRouterFunctions.route("dotnet-city-service")
+                .route(request -> request.path().startsWith("/api/city/"), HandlerFunctions.http())
+                .before(BeforeFilterFunctions.uri("http://host.docker.internal:5181"))  // Changé
+                .before(request -> addAuthHeaders(request))
                 .build();
+
+        // Route for ASP.NET Event Service
+        RouterFunction<ServerResponse> eventRoute = GatewayRouterFunctions.route("aspnet-event-service")
+                .route(request -> request.path().startsWith("/api/event/"), HandlerFunctions.http())
+                .before(BeforeFilterFunctions.uri("http://host.docker.internal:5138"))  // Changé de localhost à host.docker.internal
+                .before(request -> addAuthHeaders(request))
+                .build();
+
+        // Combine both routes
+        return cityRoute.and(eventRoute);
+    }
+
+    private ServerRequest addAuthHeaders(ServerRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            String userId = (String) auth.getPrincipal();
+            String role = auth.getAuthorities().iterator().next().getAuthority();
+            return ServerRequest.from(request)
+                    .header("X-User-Id", userId)
+                    .header("X-User-Role", role)
+                    .build();
+        }
+        return request;
     }
 }
