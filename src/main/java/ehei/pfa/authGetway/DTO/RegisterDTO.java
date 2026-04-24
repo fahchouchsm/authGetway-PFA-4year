@@ -1,21 +1,22 @@
-package ehei.pfa.authGetway.DTO.authDTO;
+package ehei.pfa.authGetway.DTO;
 
-
+import ehei.pfa.authGetway.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @Getter
-public class UserLoginDTO {
+@NoArgsConstructor
+public class RegisterDTO {
     @NotBlank
     @Email
     private String email;
+
     @NotBlank
-    @Size(min=3, max=50)
+    @Size(min = 6, max = 100)
     private String password;
 
-    private boolean stayLogin;
+    private UserRole role;
 }
