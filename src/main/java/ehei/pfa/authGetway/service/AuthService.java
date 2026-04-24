@@ -1,6 +1,6 @@
 package ehei.pfa.authGetway.service;
 
-import ehei.pfa.authGetway.DTO.RegisterDTO;
+import ehei.pfa.authGetway.DTO.auth.RegisterDTO;
 import ehei.pfa.authGetway.DTO.auth.UserLoginDTO;
 import ehei.pfa.authGetway.DTO.res.RegisterResDTO;
 import ehei.pfa.authGetway.config.AppProperties;

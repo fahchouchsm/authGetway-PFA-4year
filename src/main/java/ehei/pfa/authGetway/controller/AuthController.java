@@ -1,6 +1,6 @@
     package ehei.pfa.authGetway.controller;
 
-    import ehei.pfa.authGetway.DTO.RegisterDTO;
+    import ehei.pfa.authGetway.DTO.auth.RegisterDTO;
     import ehei.pfa.authGetway.DTO.auth.UserLoginDTO;
     import ehei.pfa.authGetway.DTO.res.ApiResponse;
     import ehei.pfa.authGetway.DTO.res.LoginResDTO;

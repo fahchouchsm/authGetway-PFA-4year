@@ -1,4 +1,4 @@
-package ehei.pfa.authGetway.DTO;
+package ehei.pfa.authGetway.DTO.auth;
 
 import ehei.pfa.authGetway.enums.UserRole;
 import jakarta.validation.constraints.Email;
