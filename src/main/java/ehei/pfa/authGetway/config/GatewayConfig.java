@@ -20,14 +20,15 @@ public class GatewayConfig {
     @Order(Ordered.LOWEST_PRECEDENCE)
     public RouterFunction<ServerResponse> routes() {
         return GatewayRouterFunctions.route("dotnet-service")
-                .route(request -> request.path().startsWith("/api/city/"), HandlerFunctions.http())
-                .before(BeforeFilterFunctions.uri("http://localhost:8085"))
+                .route(request -> request.path().startsWith("/api/city/"),
+                        HandlerFunctions.http())
+                .before(BeforeFilterFunctions.uri("http://localhost:5181"))
                 .before(request -> {
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                     if (auth != null && auth.isAuthenticated()) {
                         String userId = (String) auth.getPrincipal();
                         String role = auth.getAuthorities().iterator().next().getAuthority();
-                        return ServerRequest    .from(request)
+                        return ServerRequest.from(request)
                                 .header("X-User-Id", userId)
                                 .header("X-User-Role", role)
                                 .build();

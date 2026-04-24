@@ -17,7 +17,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter implements Filter {
-
     private final JwtUtil jwtUtil;
     private final StringRedisTemplate redis;
 
@@ -31,26 +30,24 @@ public class JwtAuthFilter implements Filter {
             "/user/verify/email",
             "/swagger-ui",
             "/v3/api-docs",
-            "/jwt/public_key",
-            "/api/city/"
+            "/jwt/public_key"
     );
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
-
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
         String path = request.getRequestURI();
         boolean isPublic = PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+
         if (isPublic) {
             chain.doFilter(req, res);
             return;
         }
 
         String header = request.getHeader("Authorization");
-
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
             try {
@@ -79,7 +76,6 @@ public class JwtAuthFilter implements Filter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 chain.doFilter(mutated, res);
                 return;
-
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Invalid or expired token");
@@ -87,6 +83,8 @@ public class JwtAuthFilter implements Filter {
             }
         }
 
-        chain.doFilter(req, res);
+        // No valid JWT for protected endpoint
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write("Authentication required");
     }
 }
