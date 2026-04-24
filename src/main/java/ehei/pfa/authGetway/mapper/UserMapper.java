@@ -1,7 +1,7 @@
 package ehei.pfa.authGetway.mapper;
 
 import ehei.pfa.authGetway.DTO.AdminCreateUserDTO;
-import ehei.pfa.authGetway.DTO.RegisterDTO;
+import ehei.pfa.authGetway.DTO.auth.RegisterDTO;
 import ehei.pfa.authGetway.DTO.res.MeDTO;
 import ehei.pfa.authGetway.DTO.res.RegisterResDTO;
 import ehei.pfa.authGetway.DTO.res.UserResDTO;
