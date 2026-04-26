@@ -1,6 +1,7 @@
 package ehei.pfa.authGetway.constant;
 
 public class TIME {
+    public static final long FIFTEENMIN = 15 * 60 * 1000L;
     public static final long ONEHOUR = 3600000L;
     public static final long ONEDAY = 86400000L;
     public static final long WEEK = 604800000L;

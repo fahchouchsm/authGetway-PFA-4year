@@ -12,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
 @Component
@@ -36,6 +38,7 @@ public class JwtAuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
+
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
@@ -48,42 +51,61 @@ public class JwtAuthFilter implements Filter {
         }
 
         String header = request.getHeader("Authorization");
+
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
+
             try {
                 if (Boolean.TRUE.equals(redis.hasKey("blacklist:" + token))) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write("Token has been revoked");
+                    response.getWriter().write("Token revoked");
                     return;
                 }
 
                 var claims = jwtUtil.parseClaims(token);
+
                 String userId = claims.getSubject();
                 String role = claims.get("role", String.class);
 
                 HttpServletRequestWrapper mutated = new HttpServletRequestWrapper(request) {
+
                     @Override
                     public String getHeader(String name) {
-                        if ("X-User-Id".equals(name)) return userId;
-                        if ("X-User-Role".equals(name)) return role;
+                        if ("X-User-Id".equalsIgnoreCase(name)) return userId;
+                        if ("X-User-Role".equalsIgnoreCase(name)) return role;
                         return super.getHeader(name);
+                    }
+
+                    @Override
+                    public Enumeration<String> getHeaders(String name) {
+                        if ("X-User-Id".equalsIgnoreCase(name)) {
+                            return Collections.enumeration(List.of(userId));
+                        }
+                        if ("X-User-Role".equalsIgnoreCase(name)) {
+                            return Collections.enumeration(List.of(role));
+                        }
+                        return super.getHeaders(name);
                     }
                 };
 
                 var auth = new UsernamePasswordAuthenticationToken(
-                        userId, null, List.of(() -> "ROLE_" + role)
+                        userId,
+                        null,
+                        List.of(() -> "ROLE_" + role)
                 );
+
                 SecurityContextHolder.getContext().setAuthentication(auth);
+
                 chain.doFilter(mutated, res);
                 return;
+
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid or expired token");
+                response.getWriter().write("Invalid token");
                 return;
             }
         }
 
-        // No valid JWT for protected endpoint
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getWriter().write("Authentication required");
     }

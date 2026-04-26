@@ -69,7 +69,7 @@ public class JwtUtil {
     }
 
     public String genToken(String userId, UserRole role) {
-        return genToken(userId, role, TIME.ONEHOUR);
+        return genToken(userId, role, TIME.FIFTEENMIN);
     }
 
     public String genRefreshToken(String userId, long expMillis) {

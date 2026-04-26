@@ -93,12 +93,14 @@ public class AuthService {
     }
 
     public void logout(String accessToken, String refreshToken, HttpServletResponse response) {
-        var claims = jwtUtil.parseClaims(accessToken);
-        long ttl = claims.getExpiration().getTime() - System.currentTimeMillis();
-        redis.opsForValue().set("blacklist:" + accessToken, "revoked", ttl, TimeUnit.MILLISECONDS);
-
-        String userId = claims.getSubject();
-        redis.delete("refresh:" + userId);
+        try {
+            var claims = jwtUtil.parseClaims(accessToken);
+            long ttl = claims.getExpiration().getTime() - System.currentTimeMillis();
+            if (ttl > 0) {
+                redis.opsForValue().set("blacklist:" + accessToken, "revoked", ttl, TimeUnit.MILLISECONDS);
+            }
+            redis.delete("refresh:" + claims.getSubject());
+        } catch (Exception ignored) {}
 
         response.addHeader("Set-Cookie", String.format(
                 "%s=; Max-Age=0; Path=/auth; HttpOnly; SameSite=Lax",
