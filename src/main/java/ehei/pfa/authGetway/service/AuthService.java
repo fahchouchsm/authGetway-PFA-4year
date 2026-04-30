@@ -46,7 +46,8 @@ public class AuthService {
         User user = userMapper.toEntity(dto);
         user.setRole(role);
         user.setPassword(encoder.encode(dto.getPassword()));
-
+        user.setName(dto.getName());
+        user.setLastName(dto.getLastname());
         User savedUser = userRepository.save(user);
         userService.sendVerificationEmail(savedUser);
 

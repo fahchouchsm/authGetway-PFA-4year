@@ -29,6 +29,12 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String lastName;
+
     @PrePersist
     void setDefault() {
         if (id == null || id.isBlank()) {

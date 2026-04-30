@@ -23,14 +23,14 @@ public class GatewayConfig {
         // Route for .NET City Service
         RouterFunction<ServerResponse> cityRoute = GatewayRouterFunctions.route("dotnet-city-service")
                 .route(request -> request.path().startsWith("/api/city/"), HandlerFunctions.http())
-                .before(BeforeFilterFunctions.uri("http://host.docker.internal:5181"))  // Changé
+                .before(BeforeFilterFunctions.uri("http://fixmycity:8080")) // ✅ FIXED
                 .before(request -> addAuthHeaders(request))
                 .build();
 
         // Route for ASP.NET Event Service
         RouterFunction<ServerResponse> eventRoute = GatewayRouterFunctions.route("aspnet-event-service")
                 .route(request -> request.path().startsWith("/api/event/"), HandlerFunctions.http())
-                .before(BeforeFilterFunctions.uri("http://host.docker.internal:5138"))  // Changé de localhost à host.docker.internal
+                .before(BeforeFilterFunctions.uri("http://eventhandler-api:5138"))  // Changé de localhost à host.docker.internal
                 .before(request -> addAuthHeaders(request))
                 .build();
 

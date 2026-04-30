@@ -10,6 +10,8 @@ public class RegisterResDTO {
     private String id;
     private String email;
     private boolean verifiedEmail;
+    private String name;
+    private String lastName;
     private UserRole role;
     private String accessToken;
 }
