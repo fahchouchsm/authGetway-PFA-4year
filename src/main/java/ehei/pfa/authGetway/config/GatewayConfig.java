@@ -30,7 +30,7 @@ public class GatewayConfig {
         // Route for ASP.NET Event Service
         RouterFunction<ServerResponse> eventRoute = GatewayRouterFunctions.route("aspnet-event-service")
                 .route(request -> request.path().startsWith("/api/event/"), HandlerFunctions.http())
-                .before(BeforeFilterFunctions.uri("http://eventhandler-api:5138"))  // Changé de localhost à host.docker.internal
+                .before(BeforeFilterFunctions.uri("http://host.docker.internal:5138"))
                 .before(request -> addAuthHeaders(request))
                 .build();
 

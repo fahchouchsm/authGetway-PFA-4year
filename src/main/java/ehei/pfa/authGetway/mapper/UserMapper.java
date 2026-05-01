@@ -28,6 +28,8 @@ public class UserMapper {
                 user.getId(),
                 user.getEmail(),
                 user.isVerifiedEmail(),
+                user.getName(),
+                user.getLastName(),
                 user.getRole(),
                 accessToken
         );
