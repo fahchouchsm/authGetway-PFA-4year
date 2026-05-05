@@ -1,0 +1,14 @@
+{
+  "microservices": [
+    {
+      "id": "dotnet-city-service",
+      "ipAddress": "http://fixmycity:8080",
+      "path": "/api/city/"
+    },
+    {
+      "id": "aspnet-event-service",
+      "ipAddress": "http://eventhandler-api:5138",
+      "path": "/api/event/"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package ehei.pfa.authGetway.config;
 
+import ehei.pfa.authGetway.DTO.Microservice;
 import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions;
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions;
 import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions;
@@ -19,23 +20,18 @@ public class GatewayConfig {
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE)
     public RouterFunction<ServerResponse> routes() {
+        return Microservice.getMicroservices().stream()
+                .map(this::buildRoute)
+                .reduce(RouterFunction::and)
+                .orElseThrow(() -> new IllegalStateException("No microservices configured"));
+    }
 
-        // Route for .NET City Service
-        RouterFunction<ServerResponse> cityRoute = GatewayRouterFunctions.route("dotnet-city-service")
-                .route(request -> request.path().startsWith("/api/city/"), HandlerFunctions.http())
-                .before(BeforeFilterFunctions.uri("http://fixmycity:8080")) // ✅ FIXED
-                .before(request -> addAuthHeaders(request))
+    private RouterFunction<ServerResponse> buildRoute(Microservice ms) {
+        return GatewayRouterFunctions.route(ms.getId())
+                .route(request -> request.path().startsWith(ms.getPath()), HandlerFunctions.http())
+                .before(BeforeFilterFunctions.uri(ms.getIpAddress()))
+                .before(this::addAuthHeaders)
                 .build();
-
-        // Route for ASP.NET Event Service
-        RouterFunction<ServerResponse> eventRoute = GatewayRouterFunctions.route("aspnet-event-service")
-                .route(request -> request.path().startsWith("/api/event/"), HandlerFunctions.http())
-                .before(BeforeFilterFunctions.uri("http://host.docker.internal:5138"))
-                .before(request -> addAuthHeaders(request))
-                .build();
-
-        // Combine both routes
-        return cityRoute.and(eventRoute);
     }
 
     private ServerRequest addAuthHeaders(ServerRequest request) {
