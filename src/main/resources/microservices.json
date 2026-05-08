@@ -2,7 +2,7 @@
   "microservices": [
     {
       "id": "dotnet-city-service",
-      "ipAddress": "http://fixmycity:8080",
+      "ipAddress": "http://host.docker.internal:5181",
       "path": "/api/city/"
     },
     {
