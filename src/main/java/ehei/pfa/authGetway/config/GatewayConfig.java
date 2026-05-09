@@ -1,6 +1,9 @@
 package ehei.pfa.authGetway.config;
 
 import ehei.pfa.authGetway.DTO.Microservice;
+import ehei.pfa.authGetway.database.entity.User;
+import ehei.pfa.authGetway.database.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions;
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions;
 import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions;
@@ -15,7 +18,9 @@ import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
 
 @Configuration
+@RequiredArgsConstructor
 public class GatewayConfig {
+    private final UserRepository userRepository;
 
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE)
@@ -39,10 +44,19 @@ public class GatewayConfig {
         if (auth != null && auth.isAuthenticated()) {
             String userId = (String) auth.getPrincipal();
             String role = auth.getAuthorities().iterator().next().getAuthority();
-            return ServerRequest.from(request)
+
+            ServerRequest.Builder builder = ServerRequest.from(request)
                     .header("X-User-Id", userId)
-                    .header("X-User-Role", role)
-                    .build();
+                    .header("X-User-Role", role);
+
+            if (request.path().endsWith("/register")) {
+                User user = userRepository.findById(userId).orElseThrow();
+                builder.header("X-User-Email", user.getEmail())
+                        .header("X-User-Name", user.getName())
+                        .header("X-User-LastName", user.getLastName());
+            }
+
+            return builder.build();
         }
         return request;
     }
