@@ -1,0 +1,41 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+title AuthGateway - Cas d'Utilisation (Simplifié)
+
+actor "Utilisateur" as User
+actor "Admin" as Admin
+
+rectangle "AuthGateway" {
+    usecase "S'inscrire" as UC_Register
+    usecase "Vérifier l'email" as UC_Verify
+    usecase "Se connecter" as UC_Login
+    usecase "Rafraîchir la session" as UC_Refresh
+    usecase "Se déconnecter" as UC_Logout
+    usecase "Accéder à un Microservice" as UC_Gateway
+    usecase "Valider Jeton (JWT)" as UC_Auth <<Internal>>
+    usecase "Gestion d'utilisateur" as UC_GestionUser
+}
+
+' Interactions de l'utilisateur
+User --> UC_Register
+User --> UC_Verify
+User --> UC_Login
+User --> UC_Logout
+User --> UC_Refresh
+User --> UC_Gateway
+
+' Logique interne (Include)
+UC_Gateway ..> UC_Auth : <<include>>
+UC_Logout ..> UC_Auth : <<include>>
+
+Admin --|> User
+
+Admin --> UC_GestionUser
+
+' Lien vers les systèmes externes
+
+@enduml

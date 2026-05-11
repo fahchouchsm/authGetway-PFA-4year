@@ -1,6 +1,6 @@
 package ehei.pfa.authGetway.config;
 
-import ehei.pfa.authGetway.DTO.Microservice;
+import ehei.pfa.authGetway.Getway.Microservice;
 import ehei.pfa.authGetway.database.entity.User;
 import ehei.pfa.authGetway.database.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

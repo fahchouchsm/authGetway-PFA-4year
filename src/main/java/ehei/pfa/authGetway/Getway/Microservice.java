@@ -1,4 +1,4 @@
-package ehei.pfa.authGetway.DTO;
+package ehei.pfa.authGetway.Getway;
 
 import lombok.Getter;
 import org.springframework.core.io.ClassPathResource;

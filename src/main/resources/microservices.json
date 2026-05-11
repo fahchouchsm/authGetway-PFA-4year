@@ -2,13 +2,23 @@
   "microservices": [
     {
       "id": "dotnet-city-service",
-      "ipAddress": "http://host.docker.internal:5181",
+      "ipAddress": "http://fixmycity:8080",
       "path": "/api/city/"
     },
     {
       "id": "aspnet-event-service",
-      "ipAddress": "http://eventhandler-api:5138",
+      "ipAddress": "http://eventshandler:5138",
       "path": "/api/event/"
+    },
+    {
+      "id": "busway-service",
+      "ipAddress": "http://busway:9090",
+      "path": "/api/busway/"
+    },
+    {
+      "id": "job-finder-service",
+      "ipAddress": "http://jobfinder_nginx:80",
+      "path": "/api/jobs/"
     }
   ]
 }

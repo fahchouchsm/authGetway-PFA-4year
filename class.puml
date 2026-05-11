@@ -1,0 +1,100 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+
+title Auth Gateway
+
+package "Configuration" {
+
+    class AppConfig {
+        - JwtAuthFilter jwtAuthFilter
+        - ReqLogFilter reqLogFilter
+
+        + securityFilterChain(http)
+        + corsConfigurationSource()
+    }
+
+    class AppProperties {
+        + jwtSecret
+        + jwtRefreshSecret
+    }
+
+    class GatewayConfig {
+        - UserRepository userRepository
+
+        + routes()
+        - buildRoute(ms)
+        - addAuthHeaders(request)
+    }
+}
+
+package "Security" {
+
+    class JwtUtil {
+        - AppProperties appProperties
+        - SecretKey signingKey
+        - SecretKey refreshKey
+
+        + init()
+        + genToken(userId, role, expMillis)
+        + genRefreshToken(userId, expMillis)
+        + validateRefreshToken(token)
+        + parseClaims(token)
+    }
+
+    class JwtAuthFilter {
+        - JwtUtil jwtUtil
+        - StringRedisTemplate redis
+
+        + doFilter(req, res, chain)
+    }
+
+    class VerificationToken {
+        - StringRedisTemplate redis
+
+        + createToken(userId)
+        + consumeToken(token)
+    }
+}
+
+package "Persistence" {
+
+    class User {
+        + id : String
+        + email : String
+        + verifiedEmail : boolean
+        + password : String
+        + role : UserRole
+        + name : String
+        + lastName : String
+    }
+
+    class UserRepository {
+        + findById(id)
+    }
+}
+
+package "Gateway" {
+
+    class Microservice {
+        + id
+        + path
+        + ipAddress
+    }
+}
+
+' =========================
+' RELATIONS
+' =========================
+
+AppConfig --> JwtAuthFilter
+
+JwtAuthFilter --> JwtUtil
+
+JwtUtil --> AppProperties
+
+GatewayConfig --> Microservice
+GatewayConfig --> User
+
+@enduml
