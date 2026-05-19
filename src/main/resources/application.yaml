@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3310/authgetway}
+    url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME:auth}
     password: ${SPRING_DATASOURCE_PASSWORD:auth}
 
@@ -31,18 +31,8 @@ spring:
           starttls:
             enable: true
 
-springdoc:
-  swagger-ui:
-    urls:
-      - name: jobfinder
-        url: /jobs/v3/api-docs
-      - name: eventhandler
-        url: /events/v3/api-docs
-  api-docs:
-    enabled: true
-
 app:
-  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  frontend-url: ${FRONTEND_URL}
   mail:
     from: simofff0@gmail.com
   use-https: false

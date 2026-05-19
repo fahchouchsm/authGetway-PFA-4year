@@ -14,7 +14,6 @@ import org.springframework.web.servlet.view.RedirectView;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-
     @Value("${app.frontend-url}")
     private String frontendUrl;
     private final UserService userService;

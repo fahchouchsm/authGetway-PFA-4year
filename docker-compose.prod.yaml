@@ -1,0 +1,49 @@
+services:
+  auth-redis:
+    image: redis:7-alpine
+    container_name: auth-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  auth-gateway:
+    build: .
+    container_name: auth-gateway
+    depends_on:
+      auth-redis:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://YOUR_RDS_ENDPOINT:3306/authgetway?allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: YOUR_RDS_USERNAME
+      SPRING_DATASOURCE_PASSWORD: YOUR_RDS_PASSWORD
+
+      SPRING_DATA_REDIS_HOST: auth-redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SERVER_PORT: 8082
+
+      FRONTEND_URL: https://YOUR_FRONTEND_CLOUDFRONT_DOMAIN
+      APP_USE_HTTPS: "true"
+
+      JWT_SECRET: CHANGE_THIS_LONG_RANDOM_SECRET_32_CHARS_MIN
+      JWT_REFRESH_SECRET: CHANGE_THIS_OTHER_LONG_RANDOM_SECRET_32_CHARS_MIN
+
+    ports:
+      - "8082:8082"
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  redis_data:
